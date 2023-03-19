@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import roboticstoolbox as rtb
 
-from assistant.cyton import CytonGamma300
+from assistant.cyton.cyton import CytonGamma300
 from spatialmath import SE3
 
 st.title("Pick and Place Robot")
