@@ -82,17 +82,6 @@ class Scheduler:
         self.goal.extend(item_end_locations)
         self.goal.append(occ_states[0])
 
-        print(self.start)
-        print(self.goal)
-
-        # self.start = ['(item Block1)', '(place A)', '(place B1)',
-        #               '(place SHOW)', '(place HOME)',
-        #               '(agent Cyton)', '(at Block1 A)', '(at Cyton HOME)']
-        #
-        # self.goal = ['(item Block1)', '(place A)', '(place B1)',
-        #              '(place SHOW)', '(place HOME)',
-        #              '(agent Cyton)', '(at Block1 B1)', '(at Cyton B1)']
-
         self.actions = {
             "move_to_block": {
                 "action": "(move_to_block ?agent ?from ?to)",
@@ -203,8 +192,11 @@ class Scheduler:
             }
         }
 
-    def execute(self, max_depth: int):
-        return forward_planner(self.start, self.goal, self.actions, max_depth=max_depth)
+    def execute(self):
+        print("Working...")
+        plan = forward_planner(self.start, self.goal, self.actions)
+        print(f"Plan found - {len(plan)} actions")
+        return plan
 
 
 if __name__ == "__main__":
@@ -212,4 +204,4 @@ if __name__ == "__main__":
     # blocks = [Block(1, color="blue", location=BlockEndLocations.A)]
     scheduler = Scheduler(blocks)
 
-    print("PLAN: ", scheduler.execute(max_depth=100))
+    print("PLAN: ", scheduler.execute())

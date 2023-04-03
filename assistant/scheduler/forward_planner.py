@@ -177,8 +177,7 @@ def forward_planner(start_state: List[str],
                     actions: Dict,
                     plan: List[str] = [],
                     explored_list: List[Set[str]] = [],
-                    debug: bool = False,
-                    max_depth: int = 10):
+                    debug: bool = False):
     """
     forward_planner
 
@@ -202,15 +201,6 @@ def forward_planner(start_state: List[str],
     """
     if all([goal_term in set(start_state) for goal_term in goal]):
         return plan + [start_state] if debug else plan
-
-
-    print(start_state)
-    print(plan)
-
-    if max_depth == 0:
-        return None
-    else:
-        print(max_depth)
 
     successor_sublists, action_names, transitions = successors(start_state, actions), list(actions.keys()), []
     for name in action_names:
@@ -241,7 +231,7 @@ def forward_planner(start_state: List[str],
 
         new_plan.append(action)
         new_explored.append(set(new_state))
-        resulting_plan = forward_planner(new_state, goal, actions, new_plan, new_explored, debug, max_depth=max_depth-1)
+        resulting_plan = forward_planner(new_state, goal, actions, new_plan, new_explored, debug)
 
         if resulting_plan is not None:
             return resulting_plan
