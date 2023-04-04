@@ -42,7 +42,7 @@ def main():
 
     # Disconnect the robot
     robot.disconnect()
-    
+
 
 if __name__ == "__main__":
     main()
