@@ -35,7 +35,7 @@ def main():
 
     # Loop through the items and their drop-off locations, and execute the pick-and-place sequence for each item
     for cube_location, dropoff_location in zip(cube_locations, dropoff_locations):
-        controller.pick_and_place(item, dropoff_location)
+        controller.pick_and_place(cube_location, dropoff_location)
 
     # Robot returns home
     controller.goto_home()
