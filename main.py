@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -8,10 +9,11 @@ import roboticstoolbox as rtb
 from assistant.cyton.cyton import CytonGamma300
 from spatialmath import SE3
 
+
 st.title("Pick and Place Robot")
 st.header("Cyton 300 Gamma")
 
-robot = rtb.models.Panda()
+robot = CytonGamma300()
 robot_txt = f"```console" \
             f"{robot}" \
             f"```"
@@ -24,7 +26,7 @@ print(sol)
 q_pickup = sol[0]
 print(robot.fkine(q_pickup))    # FK shows that desired end-effector pose was achieved
 
-qt = rtb.jtraj(robot.qr, q_pickup, 50)
+qt = rtb.jtraj(robot.qz, q_pickup, 50)
 
 fig = plt.figure()
 robot.plot(qt.q, backend="pyplot", fig=fig)
