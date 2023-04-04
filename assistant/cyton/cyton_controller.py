@@ -86,7 +86,12 @@ class CytonController:
 
 
     def goto_pickup(self, item: BaseItem):
-        self.open_gripper()     # open gripper to pick up object
+        """
+        Goes to the pickup location
+        :return: None
+        """
+        self.open_gripper()     # open gripper to pick up object (or keep gripper open)
+
         robot_pickup_pose = self.robot.ikine_LM(item.pose, q0=self.pose)
         traj = jtraj(self.pose, robot_pickup_pose, 100)
 
@@ -95,6 +100,10 @@ class CytonController:
 
 
     def goto_dropoff(self, location: SE3):
+        """
+        Goes to the dropoff location
+        :return: None
+        """
         robot_dropoff_pose = self.robot.ikine_LM(location, q0=self.pose)
         traj = jtraj(self.pose, robot_dropoff_pose, 100)
 
@@ -117,6 +126,11 @@ class CytonController:
 
 
     def goto_home(self):
+        """
+        Goes back to initial starting point
+        :return: None
+        """
+        self.close_gripper()     # close gripper for the home state
         self.set_pose(self.robot.qz)
 
 
