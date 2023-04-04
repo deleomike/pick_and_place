@@ -1,3 +1,4 @@
+
 import socket
 
 from assistant.cyton.cyton import CytonGamma300
@@ -33,6 +34,7 @@ class CytonController:
 
         self.set_pose(self.pose)
 
+
     def establish_connection(self, udp_ip: str = "127.0.0.1", udp_port: int = 5005) -> bool:
         """
         Establishes a connection to the robot
@@ -45,6 +47,7 @@ class CytonController:
 
         self.sock = socket.socket(socket.AF_INET,  # Internet
                                   socket.SOCK_DGRAM)  # UDP
+
 
     def set_pose(self, q: SE3):
         """
@@ -65,15 +68,57 @@ class CytonController:
                 self.sock.send(q)
         # TODO: fake printouts
 
-    def go_home(self):
+
+    def open_gripper(self):
+        """
+        Opens the gripper
+        :return: None
+        """
+        self.robot.open_gripper()
+
+
+    def close_gripper(self):
+        """
+        Closes the gripper
+        :return: None
+        """
+        self.robot.close_gripper()
+
+
+    def goto_pickup(self, item: BaseItem):
+        self.open_gripper()     # open gripper to pick up object
+        robot_pickup_pose = self.robot.ikine_LM(item.pose, q0=self.pose)
+        traj = jtraj(self.pose, robot_pickup_pose, 100)
+
+        self.set_pose(traj)
+        self.close_gripper()    # close gripper upon object pickup
+
+
+    def goto_dropoff(self, location: SE3):
+        robot_dropoff_pose = self.robot.ikine_LM(location, q0=self.pose)
+        traj = jtraj(self.pose, robot_dropoff_pose, 100)
+
+        self.set_pose(traj)
+        self.open_gripper()     # open gripper to drop off object
+
+
+    def pick_and_place(self, item: BaseItem, dropoff_location: SE3):
+        """
+        Executes a pick-and-place sequence with the robot.
+        :param item: The object to be picked up
+        :param dropoff_location: The drop-off location for the object
+        :return: None
+        """
+        # Go to object (cube) location
+        self.goto_pickup(item)
+
+        # Move to drop-off location
+        self.goto_dropoff(dropoff_location)
+
+
+    def goto_home(self):
         self.set_pose(self.robot.qz)
-
-    def grab_object(self, item: BaseItem):
-        robot_object_pose = self.robot.ikine_LM(item.pose, q0=self.pose)
-
-        traj = jtraj(self.pose, robot_object_pose, 100)
 
 
 if __name__ == "__main__":
-
     controller = CytonController(connect=True)
