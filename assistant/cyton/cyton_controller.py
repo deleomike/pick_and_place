@@ -1,10 +1,12 @@
 
 import socket
+import numpy as np
+
+from spatialmath import SE3
+from roboticstoolbox import jtraj
 
 from assistant.cyton.cyton import CytonGamma300
-from spatialmath import SE3
-from assistant.items.BaseItem import BaseItem
-from roboticstoolbox import jtraj
+from assistant.items.Block import Block
 
 
 class CytonController:
@@ -69,37 +71,76 @@ class CytonController:
         # TODO: fake printouts
 
 
-    def open_gripper(self):
+    def set_gripper(self, gripper_value):
+        """
+        Sets the gripper width
+        :param gripper_value: The desired gripper width
+        :return: None
+        """
+        gripper_joint_index = 5  # Index of the joint controlling gripper for Cyton Gamma 300
+
+        # Set the joint position to the desired gripper_value (see `cyton.py`)
+        gripper_joint_position = self.robot.set_joint_position(gripper_joint_index, gripper_value)
+        gripper_joint_position
+
+        print(f"Gripper joint position: {gripper_joint_position}")
+
+
+    def open_gripper(self, item: Block):
         """
         Opens the gripper
         :return: None
         """
-        self.robot.open_gripper()
+        width = item.width  # in meters
+        some_offset = 0.01  # in meters
+
+        # Add an offset to the block width to open the gripper
+        open_gripper_pos = self.set_gripper(width + some_offset)
+        open_gripper_pos
+
+        print(f"Open gripper position: {open_gripper_pos}")
 
 
-    def close_gripper(self):
+    # NOTE: `some_offset`` is a value we need to define to ensure the gripper is open enough to 
+    # pick up the block or closed enough to grip it. We can define this value based on our 
+    # gripper's specifications or through experimentation.
+
+
+    def close_gripper(self, item: Block):
         """
         Closes the gripper
         :return: None
         """
-        self.robot.close_gripper()
+        width = item.width  # in meters
+        some_offset = 0.01  # in meters
+
+        #  Subtract an offset from the block width to close the gripper
+        closed_gripper_pos = self.set_gripper(width - some_offset)
+        closed_gripper_pos
+
+        print(f"Closed gripper position: {closed_gripper_pos}")
 
 
-    def goto_pickup(self, item: BaseItem):
+    def run_trajectory(self, qs: List[List[float]]):
+        for q in qs:
+            self.set_pose(q)
+
+
+    def goto_pickup(self, item: Block):
         """
         Goes to the pickup location
         :return: None
         """
-        self.open_gripper()     # open gripper to pick up object (or keep gripper open)
+        self.open_gripper(item)     # open gripper to pick up object (or keep gripper open)
 
         robot_pickup_pose = self.robot.ikine_LM(item.pose, q0=self.pose)
         traj = jtraj(self.pose, robot_pickup_pose, 100)
+        
+        self.run_trajectory(traj)
+        self.close_gripper(item)    # close gripper upon object pickup
 
-        self.set_pose(traj)
-        self.close_gripper()    # close gripper upon object pickup
 
-
-    def goto_dropoff(self, location: SE3):
+    def goto_dropoff(self, item: Block, location: SE3):
         """
         Goes to the dropoff location
         :return: None
@@ -107,11 +148,11 @@ class CytonController:
         robot_dropoff_pose = self.robot.ikine_LM(location, q0=self.pose)
         traj = jtraj(self.pose, robot_dropoff_pose, 100)
 
-        self.set_pose(traj)
-        self.open_gripper()     # open gripper to drop off object
+        self.run_trajectory(traj)
+        self.open_gripper(item)     # open gripper to drop off object
 
 
-    def pick_and_place(self, item: BaseItem, dropoff_location: SE3):
+    def pick_and_place(self, item: Block, dropoff_location: SE3):
         """
         Executes a pick-and-place sequence with the robot.
         :param item: The object to be picked up
@@ -122,7 +163,7 @@ class CytonController:
         self.goto_pickup(item)
 
         # Move to drop-off location
-        self.goto_dropoff(dropoff_location)
+        self.goto_dropoff(item, dropoff_location)
 
 
     def goto_home(self):
@@ -130,7 +171,7 @@ class CytonController:
         Goes back to initial starting point
         :return: None
         """
-        self.close_gripper()     # close gripper for the home state
+        self.close_gripper(item)     # close gripper for the home state
         self.set_pose(self.robot.qz)
 
 
