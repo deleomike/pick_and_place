@@ -9,6 +9,8 @@ __pycache__/
 *.asv
 *.gif
 
+*.idea/
+
 # C extensions
 *.so
 
