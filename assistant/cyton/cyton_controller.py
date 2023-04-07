@@ -33,7 +33,14 @@ class CytonController:
 
         print(f"Setting starting pose to {self.pose}")
 
+        # TODO: This is probably not the starting point all the time. Find this out
+        self.current_angles = self.robot.qz
+
         self.go_home()
+
+    ###############################
+    # Sending Commands and Angles #
+    ###############################
 
     def set_angles(self, q: List):
         if self.client is not None:
@@ -42,18 +49,11 @@ class CytonController:
             # TODO: printout
             pass
 
-    def establish_connection(self, udp_ip: str = "127.0.0.1", udp_port: int = 5005) -> bool:
-        """
-        Establishes a connection to the robot
-        :return: True/False whether the connection was successful
-        """
-        print(f"Establishing Connection to {self.robot.name} at {udp_ip}:{udp_port}")
+        self.current_angles = q
 
-        self.udp_ip = udp_ip
-        self.udp_port = udp_port
-
-        self.sock = socket.socket(socket.AF_INET,  # Internet
-                                  socket.SOCK_DGRAM)  # UDP
+    def run_trajectory(self, qs: List[List[float]]):
+        for q in qs:
+            self.set_pose(q)
 
     def set_pose(self, T: SE3):
         """
@@ -61,13 +61,48 @@ class CytonController:
         :param q: Pose (SE3)
         :return:
         """
-        # TODO call set angles
-        q = self.robot.ikine_6s(T)
+        q = self.robot.ikine_LM(T)
         self.set_angles(q)
         # TODO: fake printouts
 
+    #############
+    # Go Places #
+    #############
+
     def go_home(self):
+        """
+        Goes back to initial starting point
+        :return: None
+        """
         self.set_angles(self.robot.qz)
+
+    def goto_pickup(self, item: Block):
+        """
+        Goes to the pickup location
+        :return: None
+        """
+        self.open_gripper(item)  # open gripper to pick up object (or keep gripper open)
+
+        robot_pickup_pose = self.robot.ikine_LM(item.pose, q0=self.pose)
+        traj = jtraj(self.pose, robot_pickup_pose, 100)
+
+        self.run_trajectory(traj)
+        self.close_gripper(item)  # close gripper upon object pickup
+
+    def goto_dropoff(self, item: Block, location: SE3):
+        """
+        Goes to the dropoff location
+        :return: None
+        """
+        robot_dropoff_pose = self.robot.ikine_LM(location, q0=self.pose)
+        traj = jtraj(self.pose, robot_dropoff_pose, 100)
+
+        self.run_trajectory(traj)
+        self.open_gripper(item)  # open gripper to drop off object
+
+    ####################
+    # General Commands #
+    ####################
 
     def set_gripper(self, gripper_value):
         """
@@ -82,7 +117,6 @@ class CytonController:
         gripper_joint_position
 
         print(f"Gripper joint position: {gripper_joint_position}")
-
 
     def open_gripper(self, item: Block):
         """
@@ -118,34 +152,6 @@ class CytonController:
 
         print(f"Closed gripper position: {closed_gripper_pos}")
 
-    def run_trajectory(self, qs: List[List[float]]):
-        for q in qs:
-            self.set_pose(q)
-
-    def goto_pickup(self, item: Block):
-        """
-        Goes to the pickup location
-        :return: None
-        """
-        self.open_gripper(item)     # open gripper to pick up object (or keep gripper open)
-
-        robot_pickup_pose = self.robot.ikine_LM(item.pose, q0=self.pose)
-        traj = jtraj(self.pose, robot_pickup_pose, 100)
-        
-        self.run_trajectory(traj)
-        self.close_gripper(item)    # close gripper upon object pickup
-
-    def goto_dropoff(self, item: Block, location: SE3):
-        """
-        Goes to the dropoff location
-        :return: None
-        """
-        robot_dropoff_pose = self.robot.ikine_LM(location, q0=self.pose)
-        traj = jtraj(self.pose, robot_dropoff_pose, 100)
-
-        self.run_trajectory(traj)
-        self.open_gripper(item)     # open gripper to drop off object
-
     def pick_and_place(self, item: Block, dropoff_location: SE3):
         """
         Executes a pick-and-place sequence with the robot.
@@ -158,14 +164,6 @@ class CytonController:
 
         # Move to drop-off location
         self.goto_dropoff(item, dropoff_location)
-
-    def goto_home(self):
-        """
-        Goes back to initial starting point
-        :return: None
-        """
-        self.close_gripper(item)     # close gripper for the home state
-        self.set_pose(self.robot.qz)
 
 
 if __name__ == "__main__":
