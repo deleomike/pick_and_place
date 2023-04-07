@@ -5,8 +5,6 @@ from roboticstoolbox import DHRobot, RevoluteDH, PrismaticDH, RevoluteMDH, Prism
 from assistant.items.BaseItem import BaseItem
 
 
-
-
 class CytonGamma300(DHRobot):
     """
     Create model of cyton gamma 300 manipulator
