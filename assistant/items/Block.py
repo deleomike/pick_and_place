@@ -1,13 +1,13 @@
-from assistant.items.BaseItem import BaseItem
 from spatialmath import SE3
 from assistant.items.locations import BlockEndLocations, BlockStartLocations
+from assistant.items.BaseItem import BaseItem
 from typing import Union
 
 
 class Block(BaseItem):
 
     def __init__(self,
-                 _id: int,
+                 pos_id: int,
                  color: str,
                  location: Union[BlockStartLocations, BlockEndLocations],
                  pose: SE3 = SE3(0, 0, 0),
@@ -18,13 +18,14 @@ class Block(BaseItem):
         super(Block, self).__init__(pose=pose)
 
         self.location = location
-        self.id = _id
+        self.pos_id = pos_id
         self.color = color
         self.width = width
         self.height = height
         self.length = length
 
-        self.home_location = BlockStartLocations(self.id)
+        self.home_location = BlockStartLocations(self.pos_id)
 
     def __str__(self):
-        return f"Block{self.id}"
+        return f"Block{self.pos_id}"
+

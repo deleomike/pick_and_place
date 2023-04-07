@@ -28,7 +28,7 @@ class Scheduler:
     def __init__(self, blocks: List[Block]):
 
         self.blocks = blocks
-        self.blocks.sort(key=lambda b: b.id)
+        self.blocks.sort(key=lambda b: b.pos_id)
 
         # Items
         items = [_item_(block) for block in self.blocks]
