@@ -4,6 +4,7 @@ import numpy as np
 from math import pi
 from roboticstoolbox import DHRobot, RevoluteDH, PrismaticDH, RevoluteMDH, PrismaticMDH
 from assistant.items.BaseItem import BaseItem
+from assistant.exceptions import FailedIKINE
 
 
 class CytonGamma300(DHRobot):
@@ -26,7 +27,7 @@ class CytonGamma300(DHRobot):
             # First Elbow Joint
             RevoluteDH(d=0, a=0.1408, alpha=-pi/2, qlim=elbow_lim, offset=pi/2),
             RevoluteDH(d=0, a=0.0718, alpha=-pi/2, qlim=elbow_lim),
-            RevoluteDH(d=0, a=0.718, alpha=pi/2, qlim=elbow_lim),
+            RevoluteDH(d=0, a=0.0718, alpha=pi/2, qlim=elbow_lim),
             RevoluteDH(d=0, a=0.1296, alpha=pi/2, qlim=elbow_lim),
             RevoluteDH(alpha=-pi/2)
         ]
@@ -39,6 +40,14 @@ class CytonGamma300(DHRobot):
     @property
     def qz(self):
         return self._qz
+
+    def safe_ikine_LM(self, *args, **kwargs):
+        ikine_res = self.ikine_LM(*args, **kwargs)
+
+        if ikine_res.success:
+            return ikine_res
+        else:
+            raise FailedIKINE(ikine_obj=ikine_res)
 
 
 if __name__ == '__main__':

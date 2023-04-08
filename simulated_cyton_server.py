@@ -1,4 +1,4 @@
-from assistant.cyton.cyton_dummy import CytonDummyServer
+from assistant.cyton import CytonDummyServer
 
 server = CytonDummyServer()
 

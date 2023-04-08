@@ -4,6 +4,11 @@ from assistant.networking import UDPServer
 
 
 class CytonDummyServer(UDPServer):
+    """
+    Dummy UDP Server
+
+    Will decode angle commands and print them to terminal
+    """
 
     def run(self):
         while True:
@@ -13,10 +18,7 @@ class CytonDummyServer(UDPServer):
 
             address = bytesAddressPair[1]
 
-            clientMsg = "Message from Client:{}".format(message)
-            clientIP = "Client IP Address:{}".format(address)
-
             q = np.frombuffer(message)
 
-            output = f"Received command from {address} - {q}"
+            output = f"Received command from {address} \n    {q}"
             print(output)
