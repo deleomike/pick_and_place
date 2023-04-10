@@ -1,0 +1,6 @@
+streamlit
+roboticstoolbox-python
+pandas
+numpy
+watchdog
+matplotlib
