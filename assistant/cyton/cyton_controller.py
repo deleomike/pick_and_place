@@ -128,10 +128,9 @@ class CytonController:
         gripper_joint_index = 5  # Index of the joint controlling gripper for Cyton Gamma 300
 
         # Set the joint position to the desired gripper_value (see `cyton.py`)
-        # gripper_joint_position = self.robot.set_joint_position(gripper_joint_index, gripper_value)
-        # gripper_joint_position
-        #
-        # print(f"Gripper joint position: {gripper_joint_position}")
+        gripper_joint_position = self.robot.set_joint_position(gripper_joint_index, gripper_value)
+
+        print(f"Gripper joint position: {gripper_joint_position}")
 
     def open_gripper(self, item: Block):
         """
