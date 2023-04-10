@@ -11,6 +11,7 @@ goal states, actions, and conditions.
 Here's a breakdown of the code, including additional comments and code snippets to explain how 
 the scheduler works:'''
 
+
 ###############################################################################################
 #####################     Import the necessary libraries and modules:     #####################
 ###############################################################################################
@@ -57,10 +58,11 @@ class Scheduler:
         self.blocks = blocks
         self.blocks.sort(key=lambda b: b.pos_id)
 
-        ######################################################################################################
-        ####################     Set up the domain components, including     #################################
-        ################     items, places, agents, states, and requirements:     ############################
-        ######################################################################################################
+
+        ########################################################################################
+        ################     Set up the domain components, including         ###################
+        ############     items, places, agents, states, and requirements:    ###################
+        ########################################################################################
 
         # Items
         items = [_item_(block) for block in self.blocks]
@@ -104,9 +106,10 @@ class Scheduler:
         base_state.extend(agents)
         base_state.extend(requirements)
 
-        ############################################################################################
-        ########################     Define the start and goal states:     #########################
-        ############################################################################################
+
+        ########################################################################################
+        ####################     Define the start and goal states:     #########################
+        ########################################################################################
 
         self.start = deepcopy(base_state)
         self.start.extend(item_start_locations)
@@ -118,15 +121,16 @@ class Scheduler:
         self.goal.extend(item_end_locations)
         self.goal.append(occ_states[0])
 
-        ############################################################################################
-        ################     Define the actions the robot can perform, including     ###############
-        ####################     1. moving to a block,                      ########################
-        ####################     2. moving to a place to place a block,     ########################
-        ####################     3. showing a block,                        ########################
-        ####################     4. going home,                             ########################
-        ####################     5. picking up a block,                     ########################
-        ####################     6. and placing a block                     ########################
-        ############################################################################################
+
+        ########################################################################################
+        ################     Define the actions the robot can perform, including     ###########
+        ####################     1. moving to a block,                      ####################
+        ####################     2. moving to a place to place a block,     ####################
+        ####################     3. showing a block,                        ####################
+        ####################     4. going home,                             ####################
+        ####################     5. picking up a block,                     ####################
+        ####################     6. and placing a block                     ####################
+        ########################################################################################
 
         self.actions = {
             "move_to_block": {
@@ -238,10 +242,10 @@ class Scheduler:
             }
         }
 
-    ##################################################################################################
-    ####                   Implement the execute method, which calls the                          ####
-    ####    `forward_planner`function and returns the sequence of actions to achieve the goal:    ####
-    ##################################################################################################
+    #############################################################################################
+    ####          Implement the execute method, which calls the `forward_planner`            ####              
+    ####         function and returns the sequence of actions to achieve the goal:           ####
+    #############################################################################################
 
     def execute(self):
         print("Working...")
@@ -249,10 +253,11 @@ class Scheduler:
         print(f"Plan found - {len(plan)} actions")
         return plan
 
-#######################################################################################################
-####                              Instantiate the `Scheduler`` class                               ####          
-####                     with a list of `Block`` objects and execute the plan:                     ####
-#######################################################################################################
+
+##################################################################################################
+####                          Instantiate the `Scheduler`` class                              ####        
+####                 with a list of `Block`` objects and execute the plan:                    ####
+##################################################################################################
 
 if __name__ == "__main__":
     blocks = [Block(idx+1, color="blue", location=e) for idx, e in enumerate(BlockEndLocations)]
