@@ -1,5 +1,5 @@
-import socket
 
+import socket
 import numpy as np
 
 from typing import List

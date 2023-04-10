@@ -1,3 +1,4 @@
+
 import numpy as np
 
 from math import pi
@@ -9,11 +10,8 @@ from assistant.exceptions import FailedIKINE
 class CytonGamma300(DHRobot):
     """
     Create model of cyton gamma 300 manipulator
-
     :notes:
-
     :references:
-
     """
 
     def __init__(self):

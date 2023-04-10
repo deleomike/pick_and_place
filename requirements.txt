@@ -4,4 +4,4 @@ pandas
 numpy
 watchdog
 matplotlib
-spatialmath
+pytest
