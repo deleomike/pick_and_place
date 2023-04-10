@@ -27,12 +27,16 @@ class CytonGamma300(DHRobot):
         Links =[
             # Base Joint
             RevoluteDH(d=0.120, a=0, alpha=pi / 2, qlim=shoulder_lim),
-            # First Elbow Joint
+            # Elbow Joint
             RevoluteDH(d=0, a=0.1408, alpha=-pi/2, qlim=elbow_lim, offset=pi/2),
+            # Elbow
             RevoluteDH(d=0, a=0.0718, alpha=-pi/2, qlim=elbow_lim),
+            # Elbow
             RevoluteDH(d=0, a=0.718, alpha=pi/2, qlim=elbow_lim),
-            RevoluteDH(d=0, a=0.1296, alpha=pi/2, qlim=elbow_lim),
-            RevoluteDH(alpha=-pi/2)
+            # wrist
+            RevoluteDH(d=0, a=0.1296, alpha=pi/2, qlim=np.array([-115, 115]) * deg),
+            # wrist
+            RevoluteDH(alpha=-pi/2, qlim=np.array([-170, 170]) * deg)
         ]
 
         super().__init__(Links, name="Cyton Gamma 300", manufacturer="Robai")
