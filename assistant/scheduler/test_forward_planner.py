@@ -1,7 +1,6 @@
+
 import pytest
-
 from assistant.scheduler.forward_planner import *
-
 
 
 d1 = {'?from': 'Home'}

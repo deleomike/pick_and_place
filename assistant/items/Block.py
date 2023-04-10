@@ -1,3 +1,4 @@
+
 from spatialmath import SE3
 from assistant.items.locations import BlockEndLocations, BlockStartLocations
 from assistant.items.BaseItem import BaseItem
@@ -28,4 +29,3 @@ class Block(BaseItem):
 
     def __str__(self):
         return f"Block{self.pos_id}"
-

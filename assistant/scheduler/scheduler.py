@@ -1,8 +1,30 @@
-from assistant.scheduler.forward_planner import forward_planner
-from assistant.items import Block, BlockStartLocations, BlockEndLocations, RobotSpecialLocations
+
+'''The scheduler below is an implementation of a forward planning algorithm that finds a 
+sequence of actions for a Cyton Gamma 300 robot to pick up/drop off a distinct set of block items. 
+
+The code represents the problem using a simple planning domain language (PDDL)-like representation.
+
+Specifically, the Scheduler class is initialized with a list of Block objects that represent the 
+items to be moved. The class constructor sets up the necessary components, including the start and 
+goal states, actions, and conditions.
+
+Here's a breakdown of the code, including additional comments and code snippets to explain how 
+the scheduler works:'''
+
+###############################################################################################
+#####################     Import the necessary libraries and modules:     #####################
+###############################################################################################
+
 from typing import List
 from copy import deepcopy
 
+from assistant.scheduler.forward_planner import forward_planner
+from assistant.items import Block, BlockStartLocations, BlockEndLocations, RobotSpecialLocations
+
+
+###############################################################################################
+###########     Define helper functions for generating PDDL-like expressions:     #############
+###############################################################################################
 
 def _item_(name):
     return f"(item {name})"
@@ -24,11 +46,21 @@ def _at_place_(thing, place):
     return f"(at {thing} {place})"
 
 
+###############################################################################################
+############################     Create the Scheduler class,     ##############################
+###################     initializing it with a list of Block objects:     #####################
+###############################################################################################
+
 class Scheduler:
     def __init__(self, blocks: List[Block]):
 
         self.blocks = blocks
         self.blocks.sort(key=lambda b: b.pos_id)
+
+        ######################################################################################################
+        ####################     Set up the domain components, including     #################################
+        ################     items, places, agents, states, and requirements:     ############################
+        ######################################################################################################
 
         # Items
         items = [_item_(block) for block in self.blocks]
@@ -72,6 +104,10 @@ class Scheduler:
         base_state.extend(agents)
         base_state.extend(requirements)
 
+        ############################################################################################
+        ########################     Define the start and goal states:     #########################
+        ############################################################################################
+
         self.start = deepcopy(base_state)
         self.start.extend(item_start_locations)
         self.start.extend(occ_states)
@@ -81,6 +117,16 @@ class Scheduler:
         self.goal = deepcopy(base_state)
         self.goal.extend(item_end_locations)
         self.goal.append(occ_states[0])
+
+        ############################################################################################
+        ################     Define the actions the robot can perform, including     ###############
+        ####################     1. moving to a block,                      ########################
+        ####################     2. moving to a place to place a block,     ########################
+        ####################     3. showing a block,                        ########################
+        ####################     4. going home,                             ########################
+        ####################     5. picking up a block,                     ########################
+        ####################     6. and placing a block                     ########################
+        ############################################################################################
 
         self.actions = {
             "move_to_block": {
@@ -192,12 +238,21 @@ class Scheduler:
             }
         }
 
+    ##################################################################################################
+    ####                   Implement the execute method, which calls the                          ####
+    ####    `forward_planner`function and returns the sequence of actions to achieve the goal:    ####
+    ##################################################################################################
+
     def execute(self):
         print("Working...")
         plan = forward_planner(self.start, self.goal, self.actions)
         print(f"Plan found - {len(plan)} actions")
         return plan
 
+#######################################################################################################
+####                              Instantiate the `Scheduler`` class                               ####          
+####                     with a list of `Block`` objects and execute the plan:                     ####
+#######################################################################################################
 
 if __name__ == "__main__":
     blocks = [Block(idx+1, color="blue", location=e) for idx, e in enumerate(BlockEndLocations)]
