@@ -1,5 +1,5 @@
-import socket
 
+import socket
 import numpy as np
 
 from typing import List
@@ -28,6 +28,8 @@ class CytonConnection:
 
         sock.connect((self.ip, port))
 
+        sock.setblocking(0)
+
         return sock
 
     def close_sockets(self):
@@ -48,9 +50,9 @@ class CytonConnection:
         self.send_sock = self._create_socket_(self.send_port)
         self.recv_sock = self._create_socket_(self.recv_port)
 
-    def send_angles(self, q: List):
+    def send_angles(self, q: List[float]):
 
-        data = np.array(q, dtype=np.float32)
+        data = np.array(q, dtype=np.double)
         data = data.view(np.uint8)
 
         try:
@@ -58,3 +60,10 @@ class CytonConnection:
         except Exception as e:
             print(f"Could not send data to {self.ip}:{self.send_port} {e}")
             raise e
+
+
+if __name__ == "__main__":
+
+    connection = CytonConnection()
+
+    connection.send_angles([0, 0.7, 0, 0.7, 0, 0.7, 0, 0.01])
