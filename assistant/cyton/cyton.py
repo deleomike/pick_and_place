@@ -53,6 +53,14 @@ class CytonGamma300(DHRobot):
 
         return joint_value
 
+    def safe_ikine_LM(self, *args, **kwargs):
+        ikine_res = self.ikine_LM(*args, **kwargs)
+
+        if ikine_res.success:
+            return ikine_res
+        else:
+            raise FailedIKINE(ikine_obj=ikine_res)
+
     @property
     def qz(self):
         return self._qz
