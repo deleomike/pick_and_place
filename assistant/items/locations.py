@@ -13,7 +13,7 @@ class RobotSpecialLocations(enum.Enum):
     SHOW = SHOW_q_vector
     HOME = HOME_q_vector
 
-# Generate random relative poses for the start locations
+# Generate random start locations
 start_locations = [[random.uniform(0, 1) for _ in range(3)] for _ in range(NUM_BLOCKS)]
 
 class BlockStartLocations(enum.Enum):
@@ -23,7 +23,7 @@ class BlockStartLocations(enum.Enum):
     B4 = start_locations[3]
     B5 = start_locations[4]
 
-# Generate random relative poses for the end locations
+# Generate random end locations
 end_locations = [[random.uniform(0, 1) for _ in range(3)] for _ in range(NUM_BLOCKS)]
 
 class BlockEndLocations(enum.Enum):
@@ -45,6 +45,6 @@ for i in range(1, NUM_BLOCKS):
     start_loc = BlockStartLocations(start_locations[i])
     end_loc = BlockEndLocations(end_locations[i])
 
-    # Print the start and end location names and poses
+    # Print the start and end location names
     print(f"{start_loc.name}: {start_loc.value}")
     print(f"{end_loc.name}: {end_loc.value}")
