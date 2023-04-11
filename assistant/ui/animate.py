@@ -4,6 +4,8 @@ from spatialmath import SE3
 from assistant.cyton.cyton import CytonGamma300
 from assistant.cyton.cyton_controller import CytonController
 from assistant.items.Block import Block
+from assistant.items.locations import *
+from assistant.items.poses import poses
 
 
 def main():
@@ -20,28 +22,44 @@ def main():
 
     # Define the list of cubes and their properties
     cubes = [
-        Block(pos_id=1,width=width,height=height,length=length,pose=SE3([0.5, 0, 0.5])),
-        Block(pos_id=2,width=width,height=height,length=length,pose=SE3([0.5, 0, 0.6])),
-        Block(pos_id=3,width=width,height=height,length=length,pose=SE3([0.5, 0, 0.7])),
-        Block(pos_id=4,width=width,height=height,length=length,pose=SE3([0.5, 0, 0.8])),
-        Block(pos_id=5,width=width,height=height,length=length,pose=SE3([0.5, 0, 0.9]))
-    ]
-
-    # Define the list of drop-off locations
-    dropoff_locations = [
-        SE3([0, 0.5, 0.5]),
-        SE3([0, 0.6, 0.5]),
-        SE3([0, 0.7, 0.5]),
-        SE3([0, 0.8, 0.5]),
-        SE3([0, 0.9, 0.5])
+        Block(pos_id=1,
+              location=loc_1,
+              pose=poses[0],
+              width=width,
+              height=height,
+              length=length),
+        Block(pos_id=2,
+              location=loc_2,
+              pose=poses[1],
+              width=width,
+              height=height,
+              length=length),
+        Block(pos_id=3,
+              location=loc_3,
+              pose=poses[2],
+              width=width,
+              height=height,
+              length=length),
+        Block(pos_id=4,
+              location=loc_4,
+              pose=poses[3],
+              width=width,
+              height=height,
+              length=length),
+        Block(pos_id=5,
+              location=loc_5,
+              pose=poses[4],
+              width=width,
+              height=height,
+              length=length)
     ]
 
     # Create a CytonController instance and establish a connection
     controller = CytonController(robot=robot, starting_pose=starting_pose, connect=True)
 
     # Loop through the items and their drop-off locations, and execute the pick-and-place sequence for each item
-    for cube, dropoff_location in zip(cubes, dropoff_locations):
-        controller.pick_and_place(cube, dropoff_location)
+    for cube in cubes:
+        controller.pick_and_place(cube)
 
     # Robot returns home
     controller.goto_home()
