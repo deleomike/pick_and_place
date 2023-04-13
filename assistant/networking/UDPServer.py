@@ -1,9 +1,12 @@
 import socket
+import threading
+import time
 
 
-class UDPServer:
+class UDPServer(threading.Thread):
 
     def __init__(self, ip: str = "127.0.0.1", listen_port: int = 8888, buffer_size: int = 1024):
+        super().__init__()
         self.ip = ip
         self.port = listen_port
         self.buffer_size = buffer_size
@@ -16,7 +19,7 @@ class UDPServer:
 
         self.sock.bind((self.ip, self.port))
 
-        print("UDP server up and listening")
+        print(f"UDP server up and listening at {self.ip}:{self.ip}")
 
     def __del__(self):
         self.sock.close()

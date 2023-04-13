@@ -29,40 +29,6 @@ class CytonController:
 
         time.sleep(5)
 
-        # print(f"Setting starting pose to one")
-        #
-        # self.go_one()
-        #
-        # time.sleep(5)
-
-        # print(f"Setting starting pose to two")
-        #
-        # self.go_two()
-        #
-        # time.sleep(5)
-        #
-        # print(f"Setting starting pose to three")
-        #
-        # self.go_three()
-        #
-        # time.sleep(5)
-        #
-        # print(f"Setting starting pose to four")
-        #
-        # self.go_four()
-        #
-        # time.sleep(5)
-        #
-        # print(f"Setting starting pose to human")
-        #
-        # self.go_human()
-
-
-        # self.set_pose(self.pose)
-
-    # def __del__(self):
-    #     self.sock.shutdown()
-
     def establish_connection(self, udp_ip: str = "127.0.0.1", udp_port: int = 8888) -> bool:
         """
         Establishes a connection to the robot
@@ -144,94 +110,6 @@ class CytonController:
     def drop(self):
         pass
 
-
-class leapController:
-    """
-    """
-
-    def __init__(self, connect: bool = False):
-
-        self.connect = connect
-
-        self.sock: socket.socket = None
-        self.udp_ip = None
-        self.udp_port = None
-
-        self.fingers = []
-        self.finger_mode = 0
-
-        if self.connect:
-            self.establish_connection()
-
-    def establish_connection(self, udp_ip: str = "127.0.0.1", udp_port: int = 5005) -> bool:
-        """
-        Establishes a connection to the robot
-        :return: True/False whether the connection was successful
-        """
-        print(f"Establishing Connection at {udp_ip}:{udp_port}")
-
-        self.udp_ip = udp_ip
-        self.udp_port = udp_port
-
-
-    def read_leap(self):
-        self.sock = socket.socket(socket.AF_INET,  # Internet
-                                  socket.SOCK_DGRAM)  # UDP
-
-        self.sock.bind((self.udp_ip, self.udp_port))
-        self.fingers = []
-        for ii in range(100):
-            data, addr = self.sock.recvfrom(1)
-            self.fingers.append(data[0])
-        self.finger_mode = mode(self.fingers)
-        self.sock.close()
-
-class myoController:
-    """
-    """
-
-    def __init__(self, connect: bool = False):
-
-        self.connect = connect
-
-        self.sock: socket.socket = None
-        self.udp_ip = None
-        self.udp_port = None
-
-        self.movement = []
-        self.movement_mode = 0
-
-        if self.connect:
-            self.establish_connection()
-
-    def establish_connection(self, udp_ip: str = "127.0.0.1", udp_port: int = 5006) -> bool:
-        """
-        Establishes a connection to the robot
-        :return: True/False whether the connection was successful
-        """
-        print(f"Establishing Connection at {udp_ip}:{udp_port}")
-
-        self.udp_ip = udp_ip
-        self.udp_port = udp_port
-
-
-    def read_myo(self):
-        self.sock = socket.socket(socket.AF_INET,  # Internet
-                                  socket.SOCK_DGRAM)  # UDP
-
-        self.sock.bind((self.udp_ip, self.udp_port))
-        self.movement = []
-        for ii in range(5):
-            data, addr = self.sock.recvfrom(1)
-            self.movement.append(data[0])
-        self.movement_mode = mode(self.movement)
-        if self.movement_mode == 1:
-            print('flexion')
-        elif self.movement_mode == 2:
-            print('extension')
-        elif self.movement_mode == 3:
-            print('rest')
-        self.sock.close()
 
 if __name__ == "__main__":
 
