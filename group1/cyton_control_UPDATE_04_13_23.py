@@ -319,6 +319,10 @@ class myoController:
         elif self.movement_mode == 2:
             print('extension')
         elif self.movement_mode == 3:
+            print('wrist in')
+        elif self.movement_mode == 4:
+            print('wrist out')
+        elif self.movement_mode == 5:
             print('rest')
         self.sock.close()
 
@@ -364,12 +368,12 @@ if __name__ == "__main__":
                 printed = 1
 
             myo.read_myo()
-            if myo.movement_mode == 1:
+            if myo.movement_mode == 4:
                 state = 'pickup_fail'
                 print("Failed pickup")
                 printed = 0
                 number_bad_pickup = number_bad_pickup + 1
-            elif myo.movement_mode == 2:
+            elif myo.movement_mode == 3:
                 state = 'pickup_success'
                 print("Successful pickup")
                 number_good_pickup = number_good_pickup + 1
@@ -412,14 +416,17 @@ if __name__ == "__main__":
                 print("waiting for drop-off approval")
                 printed = 1
             myo.read_myo()
-            if myo.movement_mode == 2:
+            if myo.movement_mode == 1:
                 print("Dropping object")
                 controller.drop()
                 time.sleep(1.5)
                 controller.go_home()
                 state = 'waiting'
                 printed = 0
-
+            elif myo.movement_mode == 2:
+                controller.go_human_show()
+                state = 'pickup_success'
+                printed = 0
         time.sleep(5)
 
 
