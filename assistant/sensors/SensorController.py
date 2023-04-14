@@ -15,6 +15,8 @@ class SensorController(UDPServer):
         self.rolling_buffer_size = rolling_buffer_size
         self.rolling_buffer = collections.deque(maxlen=self.rolling_buffer_size)
 
+        self._value_ = 0
+
     def read_data(self) -> int:
         data, _ = self.sock.recvfrom(1)
 
@@ -31,3 +33,6 @@ class SensorController(UDPServer):
     def run(self):
         while True:
             self.read_data()
+
+            self._value_ = self.get_most_frequent()
+
