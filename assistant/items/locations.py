@@ -9,12 +9,16 @@ NUM_BLOCKS = 5
 SHOW_q_vector = [0, 0, 0]  # Replace with the actual values
 HOME_q_vector = [0, 0, 0]  # Replace with the actual values
 
+
+# TODO
 class RobotSpecialLocations(enum.Enum):
     SHOW = SHOW_q_vector
     HOME = HOME_q_vector
 
+
 # Generate random start locations
 start_locations = [[random.uniform(0, 1) for _ in range(3)] for _ in range(NUM_BLOCKS)]
+
 
 class BlockStartLocations(enum.Enum):
     B1 = start_locations[0]
@@ -39,12 +43,14 @@ loc_3 = Union[BlockStartLocations.B3, BlockEndLocations.C]
 loc_4 = Union[BlockStartLocations.B4, BlockEndLocations.D]
 loc_5 = Union[BlockStartLocations.B5, BlockEndLocations.E]
 
-# Iterate through NUM_BLOCKS
-for i in range(1, NUM_BLOCKS):
-    # Get the start and end location Enums
-    start_loc = BlockStartLocations(start_locations[i])
-    end_loc = BlockEndLocations(end_locations[i])
 
-    # Print the start and end location names
-    print(f"{start_loc.name}: {start_loc.value}")
-    print(f"{end_loc.name}: {end_loc.value}")
+if __name__ == "__main__":
+    # Iterate through NUM_BLOCKS
+    for i in range(1, NUM_BLOCKS):
+        # Get the start and end location Enums
+        start_loc = BlockStartLocations(start_locations[i])
+        end_loc = BlockEndLocations(end_locations[i])
+
+        # Print the start and end location names
+        print(f"{start_loc.name}: {start_loc.value}")
+        print(f"{end_loc.name}: {end_loc.value}")
