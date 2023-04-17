@@ -1,15 +1,17 @@
 
+import enum
+
 from spatialmath import SE3
-from assistant.items.locations import BlockEndLocations, BlockStartLocations
-from assistant.items.BaseItem import BaseItem
 from typing import Union
+
+from assistant.items.locations import *
+from assistant.items.BaseItem import BaseItem
 
 
 class Block(BaseItem):
 
     def __init__(self,
                  pos_id: int,
-                 color: str,
                  location: Union[BlockStartLocations, BlockEndLocations],
                  pose: SE3 = SE3(0, 0, 0),
                  width: float = 0.1,
@@ -18,9 +20,8 @@ class Block(BaseItem):
 
         super(Block, self).__init__(pose=pose)
 
-        self.location = location
         self.pos_id = pos_id
-        self.color = color
+        self.location = location
         self.width = width
         self.height = height
         self.length = length
