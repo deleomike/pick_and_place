@@ -10,3 +10,14 @@ HTTPS Clone
 ```
 git clone https://github.com/deleomike/pick_and_place.git
 ```
+
+## Testing
+
+To test the controller with a dummy cyton server run
+
+```bash
+python simulated_cyton_server.py
+```
+
+Which will stand up a UDP server that will act like the cyton and print out positions.
+

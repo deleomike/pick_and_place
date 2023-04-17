@@ -1,20 +1,17 @@
+
 import numpy as np
 
 from math import pi
 from roboticstoolbox import DHRobot, RevoluteDH, PrismaticDH, RevoluteMDH, PrismaticMDH
 from assistant.items.BaseItem import BaseItem
-
-
+from assistant.exceptions import FailedIKINE
 
 
 class CytonGamma300(DHRobot):
     """
     Create model of cyton gamma 300 manipulator
-
     :notes:
-
     :references:
-
     """
 
     def __init__(self):
@@ -32,7 +29,7 @@ class CytonGamma300(DHRobot):
             # Elbow
             RevoluteDH(d=0, a=0.0718, alpha=-pi/2, qlim=elbow_lim),
             # Elbow
-            RevoluteDH(d=0, a=0.718, alpha=pi/2, qlim=elbow_lim),
+            RevoluteDH(d=0, a=0.0718, alpha=pi/2, qlim=elbow_lim),
             # wrist
             RevoluteDH(d=0, a=0.1296, alpha=pi/2, qlim=np.array([-115, 115]) * deg),
             # wrist
@@ -47,6 +44,14 @@ class CytonGamma300(DHRobot):
     @property
     def qz(self):
         return self._qz
+
+    def safe_ikine_LM(self, *args, **kwargs):
+        ikine_res = self.ikine_LM(*args, **kwargs)
+
+        if ikine_res.success:
+            return ikine_res
+        else:
+            raise FailedIKINE(ikine_obj=ikine_res)
 
 
 if __name__ == '__main__':
