@@ -1,8 +1,7 @@
 
 from spatialmath import SE3
 
-from assistant.cyton.cyton import CytonGamma300
-from assistant.cyton.cyton_controller import CytonController
+from assistant.cyton import CytonController, CytonGamma300, CytonConnection
 from assistant.items.Block import Block
 from assistant.items.locations import *
 from assistant.items.poses import poses
@@ -19,6 +18,9 @@ def main():
     width = 0.022098    # or 0.87 inches (by inspection)
     height = 0.022098   # or 0.87 inches (by inspection)
     length = 0.022098   # or 0.87 inches (by inspection)
+
+    start_positions = [SE3([0.1, 0, i/100]) for i in range(5)]
+    end_positions = [SE3([0.1, i/100, 0]) for i in range(5)]
 
     # Define the list of cubes and their properties
     cubes = [
@@ -54,18 +56,20 @@ def main():
               length=length)
     ]
 
+    client = CytonConnection()
+
     # Create a CytonController instance and establish a connection
-    controller = CytonController(robot=robot, starting_pose=starting_pose, connect=True)
+    controller = CytonController(robot=robot, client=client)
 
     # Loop through the items and their drop-off locations, and execute the pick-and-place sequence for each item
     for cube in cubes:
         controller.pick_and_place(cube)
 
     # Robot returns home
-    controller.goto_home()
+    controller.go_home()
 
     # Disconnect the robot
-    robot.disconnect()
+    controller.disconnect()
 
 
 if __name__ == "__main__":

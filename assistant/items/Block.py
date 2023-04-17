@@ -12,8 +12,7 @@ class Block(BaseItem):
 
     def __init__(self,
                  pos_id: int,
-                 location: Union[BlockStartLocations(start_locations[self.pos_id]),
-                                 BlockEndLocations(end_locations[self.pos_id])],
+                 location: Union[BlockStartLocations, BlockEndLocations],
                  pose: SE3 = SE3(0, 0, 0),
                  width: float = 0.1,
                  height: float = 0.1,

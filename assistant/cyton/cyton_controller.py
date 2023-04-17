@@ -1,5 +1,7 @@
 
 import socket
+import time
+
 import numpy as np
 
 from assistant.cyton.cyton import CytonGamma300
@@ -9,12 +11,10 @@ from assistant.items.BaseItem import BaseItem
 from typing import List
 from spatialmath import SE3
 from roboticstoolbox import jtraj
+from roboticstoolbox.tools.trajectory import Trajectory
 
 from assistant.cyton.cyton import CytonGamma300
 from assistant.items.Block import Block
-
-
-INITIAL_POSE = np.array([0, 0, 0])  # Replace with the actual values
 
 
 class CytonController:
@@ -24,23 +24,27 @@ class CytonController:
     """
 
     def __init__(self,
-                robot: CytonGamma300 = CytonGamma300(),
-                custom_pose: SE3 = None,
-                client: CytonConnection = None):
+                 robot: CytonGamma300 = CytonGamma300(),
+                 client: CytonConnection = None,
+                 dt: float = 0.01):
 
         self.robot = robot
         self.client = client
+        self.dt = dt
 
-        if custom_pose is None:
-            self.pose = INITIAL_POSE
-        else:
-            self.pose = custom_pose
+        # TODO: This is probably not the starting point all the time. Find this out
+        self.current_angles = self.robot.qz
 
-        print(f"Setting starting pose to {self.pose}")
+        print(f"Setting starting angles to {self.current_angles}")
 
-        self.current_angles = self.pose
         self.go_home()
 
+    def __del__(self):
+        self.disconnect()
+
+    def disconnect(self):
+        if self.client is not None:
+            self.client.close_sockets()
 
     ###############################
     # Sending Commands and Angles #
@@ -53,12 +57,11 @@ class CytonController:
             print(f"Setting angles without a client: {q}")
 
         self.current_angles = q
-
+        time.sleep(self.dt)
 
     def run_trajectory(self, qs: List[List[float]]):
         for q in qs:
-            self.set_pose(q)
-
+            self.set_angles(q)
 
     def set_pose(self, T: SE3):
         """
@@ -72,19 +75,21 @@ class CytonController:
         print(f"Setting pose: {T}")
         print(f"Corresponding joint angles: {q}")
 
-
     #############
     # Go Places #
     #############
-
 
     def go_home(self):
         """
         Goes back to initial starting point
         :return: None
         """
-        self.set_angles(self.robot.qz)
+        if (self.current_angles != self.robot.qz).all():
+            traj = jtraj(self.current_angles, self.robot.qz, 100)
 
+            self.run_trajectory(traj)
+        else:
+            self.set_angles(self.robot.qz)
 
     def goto_pickup(self, item: Block):
         """
@@ -93,24 +98,23 @@ class CytonController:
         """
         self.open_gripper(item)  # open gripper to pick up object (or keep gripper open)
 
-        robot_pickup_pose = self.robot.ikine_LM(item.pose, q0=self.pose)
-        traj = jtraj(self.pose, robot_pickup_pose, 100)
+        robot_pickup_q = self.robot.safe_ikine_LM(item.pose)
+
+        traj = jtraj(self.current_angles, robot_pickup_q.q, 100)
 
         self.run_trajectory(traj)
         self.close_gripper(item)  # close gripper upon object pickup
-
 
     def goto_dropoff(self, item: Block, location: SE3):
         """
         Goes to the dropoff location
         :return: None
         """
-        robot_dropoff_pose = self.robot.ikine_LM(location, q0=self.pose)
-        traj = jtraj(self.pose, robot_dropoff_pose, 100)
+        robot_dropoff_q = self.robot.safe_ikine_LM(location)
+        traj = jtraj(self.current_angles, robot_dropoff_q.q, 100)
 
         self.run_trajectory(traj)
         self.open_gripper(item)  # open gripper to drop off object
-
 
     ####################
     # General Commands #
@@ -122,13 +126,13 @@ class CytonController:
         :param gripper_value: The desired gripper width
         :return: None
         """
-        gripper_joint_index = 5  # Index of the joint controlling gripper for Cyton Gamma 300
 
         # Set the joint position to the desired gripper_value (see `cyton.py`)
-        gripper_joint_position = self.robot.set_joint_position(gripper_joint_index, gripper_value)
+        gripper_joint_position = self.robot.clamp_gripper_value(gripper_value)
 
         # Update the current joint angles
-        self.current_angles[gripper_joint_index] = gripper_joint_position
+        new_angles = self.current_angles
+        new_angles[-1] = gripper_joint_position
 
         # Send the updated joint angles to the robot
         self.set_angles(self.current_angles)
@@ -137,18 +141,13 @@ class CytonController:
 
         return gripper_joint_position
 
-
-    def open_gripper(self, item: Block):
+    def open_gripper(self):
         """
         Opens the gripper
         :return: None
         """
-        width = item.width  # in meters
-        some_offset = 0.01  # in meters
 
-        # Add an offset to the block width to open the gripper
-        open_gripper_pos = width + some_offset
-        self.set_gripper(open_gripper_pos)
+        open_gripper_pos = self.set_gripper(self.robot.gripper_open_value)
 
         print(f"Open gripper position: {open_gripper_pos}")
 
@@ -156,7 +155,6 @@ class CytonController:
     # NOTE: `some_offset`` is a value we need to define to ensure the gripper is open enough to 
     # pick up the block or closed enough to grip it. We can define this value based on our 
     # gripper's specifications or through experimentation.
-
 
     def close_gripper(self, item: Block):
         """
@@ -171,7 +169,6 @@ class CytonController:
         self.set_gripper(closed_gripper_pos)
 
         print(f"Closed gripper position: {closed_gripper_pos}")
-
 
     def pick_and_place(self, item: Block):
         """
