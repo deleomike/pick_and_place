@@ -1,5 +1,5 @@
 %% Set up the MiniVIE path
-cd('C:\GitHub\MiniVIE');
+cd('MiniVIE');
 MiniVIE.configurePath;
 
 %% Create an object for UDP interface to the Myo Armband
