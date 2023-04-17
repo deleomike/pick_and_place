@@ -60,6 +60,8 @@ class CytonController:
         time.sleep(self.dt)
 
     def run_trajectory(self, qs: List[List[float]]):
+        if type(qs) != List:
+            qs = qs.q
         for q in qs:
             self.set_angles(q)
 
@@ -96,25 +98,29 @@ class CytonController:
         Goes to the pickup location
         :return: None
         """
-        self.open_gripper(item)  # open gripper to pick up object (or keep gripper open)
+        self.open_gripper()  # open gripper to pick up object (or keep gripper open)
 
-        robot_pickup_q = self.robot.safe_ikine_LM(item.pose)
+        robot_pickup_q = self.robot.safe_ikine_LM(item.start_pose)
 
-        traj = jtraj(self.current_angles, robot_pickup_q.q, 100)
+        robot_pickup_q = robot_pickup_q.q.tolist()
+        robot_pickup_q.append(self.current_angles[-1])
+        traj = jtraj(self.current_angles,robot_pickup_q, 100)
 
         self.run_trajectory(traj)
         self.close_gripper(item)  # close gripper upon object pickup
 
-    def goto_dropoff(self, item: Block, location: SE3):
+    def goto_dropoff(self, item: Block):
         """
         Goes to the dropoff location
         :return: None
         """
-        robot_dropoff_q = self.robot.safe_ikine_LM(location)
-        traj = jtraj(self.current_angles, robot_dropoff_q.q, 100)
+        robot_dropoff_q = self.robot.safe_ikine_LM(item.end_pose)
+        robot_q = robot_dropoff_q.q.tolist()
+        robot_q.append(self.current_angles[-1])
+        traj = jtraj(self.current_angles, robot_q, 100)
 
         self.run_trajectory(traj)
-        self.open_gripper(item)  # open gripper to drop off object
+        self.open_gripper()  # open gripper to drop off object
 
     ####################
     # General Commands #

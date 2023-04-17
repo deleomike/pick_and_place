@@ -64,6 +64,6 @@ class CytonConnection:
 
 if __name__ == "__main__":
 
-    connection = CytonConnection()
+    connection = CytonConnection(send_port=12001, recv_port=12002)
 
     connection.send_angles([0, 0.7, 0, 0.7, 0, 0.7, 0, 0.01])
