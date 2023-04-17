@@ -7,7 +7,7 @@ from typing import List
 
 class CytonConnection:
 
-    def __init__(self, ip: str = "127.0.0.1", recv_port: int = 8889, send_port: int = 8888):
+    def __init__(self, ip: str = "127.0.0.1", recv_port: int = 12001, send_port: int = 12002):
         self.ip = ip
         self.recv_port = recv_port
         self.send_port = send_port
