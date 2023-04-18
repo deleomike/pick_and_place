@@ -11,6 +11,29 @@ HTTPS Clone
 git clone https://github.com/deleomike/pick_and_place.git
 ```
 
+## Demonstration
+
+You'll need to be logged into Admin
+
+1. Make sure the leap is connected (check the leap toolbar)
+2. Run the Leap Server
+
+run this in the `leap` directory
+```commandline
+python2.7 Sample.py
+```
+
+3. Run the MyoBand Server
+
+Open `myo_matlab.m` with matlab and run it
+
+4. Start the Cyton Actin Viewer
+   1. Load the server plugin
+   2. Enable Hardware
+   3. Hit Play
+   4. Start the client terminal script
+5. Start the main script
+
 ## Testing
 
 To test the controller with a dummy cyton server run

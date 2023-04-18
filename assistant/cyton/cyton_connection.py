@@ -7,7 +7,7 @@ from typing import List
 
 class CytonConnection:
 
-    def __init__(self, ip: str = "127.0.0.1", recv_port: int = 8889, send_port: int = 8888):
+    def __init__(self, ip: str = "127.0.0.1", send_port: int = 8888, recv_port: int = 8889):
         self.ip = ip
         self.recv_port = recv_port
         self.send_port = send_port
@@ -24,7 +24,7 @@ class CytonConnection:
         sock = socket.socket(socket.AF_INET,  # Internet
                              socket.SOCK_DGRAM)  # UDP
 
-        print(f"Establishing Connection to {self.ip}:{self.send_port}")
+        print(f"Establishing Connection to {self.ip}:{port}")
 
         sock.connect((self.ip, port))
 
@@ -64,6 +64,10 @@ class CytonConnection:
 
 if __name__ == "__main__":
 
-    connection = CytonConnection(send_port=12001, recv_port=12002)
+    connection = CytonConnection(send_port=8888, recv_port=8889)
 
-    connection.send_angles([0, 0.7, 0, 0.7, 0, 0.7, 0, 0.01])
+    # connection.send_angles([0, 0.7, 0, 0.7, 0, 0.7, 0, 0.01])
+
+    # connection.send_angles([0, 0, 0, 0.7, 0, 0.7, 0, 0.01])
+
+    connection.send_angles([0, 0, 0, 0.4, 0, 0, 0, 0.0])

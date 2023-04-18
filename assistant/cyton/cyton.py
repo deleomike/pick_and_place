@@ -33,7 +33,8 @@ class CytonGamma300(DHRobot):
             # wrist
             RevoluteDH(d=0, a=0.1296, alpha=pi/2, qlim=np.array([-115, 115]) * deg),
             # wrist
-            RevoluteDH(alpha=-pi/2, qlim=np.array([-170, 170]) * deg)
+            RevoluteDH(alpha=-pi / 2, qlim=np.array([-170, 170]) * deg),
+            RevoluteDH(alpha=-pi / 2, qlim=shoulder_lim * deg)
         ]
 
         self._links = links

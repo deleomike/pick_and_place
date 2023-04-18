@@ -5,3 +5,5 @@ numpy
 watchdog
 matplotlib
 pytest
+pynput
+tqdm
