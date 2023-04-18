@@ -28,9 +28,10 @@ python2.7 Sample.py
 Open `myo_matlab.m` with matlab and run it
 
 4. Start the Cyton Actin Viewer
-   1. Load the client plugin
+   1. Load the server plugin
    2. Enable Hardware
    3. Hit Play
+   4. Start the client terminal script
 5. Start the main script
 
 ## Testing

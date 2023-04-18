@@ -3,8 +3,10 @@ import socket
 import numpy as np
 
 import time
+
 from statistics import mode
 from pynput import keyboard
+from assistant.sensors import MyoController, MyoGestures, LeapController
 
 save_state = "waiting"
 space = False
@@ -251,106 +253,15 @@ class CytonController:
             print("Command not understood")
 
 
-
-class leapController:
-    """
-    """
-
-    def __init__(self, connect: bool = False):
-
-        self.connect = connect
-
-        self.sock: socket.socket = None
-        self.udp_ip = None
-        self.udp_port = None
-
-        self.fingers = []
-        self.finger_mode = 0
-
-        if self.connect:
-            self.establish_connection()
-
-    def establish_connection(self, udp_ip: str = "127.0.0.1", udp_port: int = 5005) -> bool:
-        """
-        Establishes a connection to the robot
-        :return: True/False whether the connection was successful
-        """
-        print(f"Establishing Connection at {udp_ip}:{udp_port}")
-
-        self.udp_ip = udp_ip
-        self.udp_port = udp_port
-
-
-    def read_leap(self):
-        self.sock = socket.socket(socket.AF_INET,  # Internet
-                                  socket.SOCK_DGRAM)  # UDP
-
-        self.sock.bind((self.udp_ip, self.udp_port))
-        self.fingers = []
-        for ii in range(100):
-            data, addr = self.sock.recvfrom(1)
-            self.fingers.append(data[0])
-        self.finger_mode = mode(self.fingers)
-        self.sock.close()
-
-class myoController:
-    """
-    """
-
-    def __init__(self, connect: bool = False):
-
-        self.connect = connect
-
-        self.sock: socket.socket = None
-        self.udp_ip = None
-        self.udp_port = None
-
-        self.movement = []
-        self.movement_mode = 0
-
-        if self.connect:
-            self.establish_connection()
-
-    def establish_connection(self, udp_ip: str = "127.0.0.1", udp_port: int = 5006) -> bool:
-        """
-        Establishes a connection to the robot
-        :return: True/False whether the connection was successful
-        """
-        print(f"Establishing Connection at {udp_ip}:{udp_port}")
-
-        self.udp_ip = udp_ip
-        self.udp_port = udp_port
-
-
-    def read_myo(self):
-        self.sock = socket.socket(socket.AF_INET,  # Internet
-                                  socket.SOCK_DGRAM)  # UDP
-
-        self.sock.bind((self.udp_ip, self.udp_port))
-        self.movement = []
-        for ii in range(5):
-            data, addr = self.sock.recvfrom(1)
-            self.movement.append(data[0])
-        self.movement_mode = mode(self.movement)
-        if self.movement_mode == 1:
-            print('flexion')
-        elif self.movement_mode == 2:
-            print('extension')
-        elif self.movement_mode == 3:
-            print('wrist in')
-        elif self.movement_mode == 4:
-            print('wrist out')
-        elif self.movement_mode == 5:
-            print('rest')
-        self.sock.close()
-
 if __name__ == "__main__":
 
     controller = CytonController(connect=True)
 
-    leap = leapController(connect=True)
+    leap = LeapController()
+    myo = MyoController()
 
-    myo = myoController(connect=True)
+    leap.start()
+    myo.start()
 
     state = 'waiting'  # state can be waiting, pickup, inspect, pickup_fail, pickup_succ, drop_loc, drop
 
@@ -370,7 +281,6 @@ if __name__ == "__main__":
             printed_pause = 0
             if state == 'waiting':
                 print("waiting for pickup location")
-                leap.read_leap()
                 if leap.finger_mode == 1:
                     controller.go_one_pick()
                 elif leap.finger_mode == 2:
@@ -396,13 +306,12 @@ if __name__ == "__main__":
                     print("waiting for inspection")
                     printed = 1
 
-                myo.read_myo()
-                if myo.movement_mode == 4:
+                if myo.gesture == 4:
                     state = 'pickup_fail'
                     print("Failed pickup")
                     printed = 0
                     number_bad_pickup = number_bad_pickup + 1
-                elif myo.movement_mode == 3:
+                elif myo.gesture == 3:
                     state = 'pickup_success'
                     print("Successful pickup")
                     number_good_pickup = number_good_pickup + 1
@@ -419,7 +328,6 @@ if __name__ == "__main__":
                 state = 'drop'
             elif state == 'pickup_success':
                 print("waiting for drop-off location")
-                leap.read_leap()
                 if leap.finger_mode == 1:
                     controller.go_one_place()
                     state = 'drop'
@@ -444,22 +352,20 @@ if __name__ == "__main__":
                 if printed == 0:
                     print("waiting for drop-off approval")
                     printed = 1
-                myo.read_myo()
-                if myo.movement_mode == 1:
+                if myo.gesture == 1:
                     print("Dropping object")
                     controller.drop()
                     time.sleep(1.5)
                     controller.go_home()
                     state = 'waiting'
                     printed = 0
-                elif myo.movement_mode == 2:
+                elif myo.gesture == 2:
                     state = 'failed_drop'
                     printed = 0
             elif state == 'failed_drop':
                 if printed == 0:
                     print("waiting for new drop-off location")
                     printed = 1
-                leap.read_leap()
                 if leap.finger_mode == 1:
                     controller.go_intermediate()
                     time.sleep(2)
