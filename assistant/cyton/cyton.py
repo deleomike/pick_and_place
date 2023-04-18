@@ -21,23 +21,49 @@ class CytonGamma300(DHRobot):
         shoulder_lim = np.array([-150, 150]) * deg
         elbow_lim = np.array([-elbow_rotate, elbow_rotate]) * deg
 
-        Links =[
+        links = [
             # Base Joint
             RevoluteDH(d=0.120, a=0, alpha=pi / 2, qlim=shoulder_lim),
-            # First Elbow Joint
+            # Elbow Joint
             RevoluteDH(d=0, a=0.1408, alpha=-pi/2, qlim=elbow_lim, offset=pi/2),
+            # Elbow
             RevoluteDH(d=0, a=0.0718, alpha=-pi/2, qlim=elbow_lim),
+            # Elbow
             RevoluteDH(d=0, a=0.0718, alpha=pi/2, qlim=elbow_lim),
-            RevoluteDH(d=0, a=0.1296, alpha=pi/2, qlim=elbow_lim),
-            RevoluteDH(alpha=-pi/2),
-            RevoluteDH(alpha=-pi / 2)
+            # wrist
+            RevoluteDH(d=0, a=0.1296, alpha=pi/2, qlim=np.array([-115, 115]) * deg),
+            # wrist
+            RevoluteDH(alpha=-pi / 2, qlim=np.array([-170, 170]) * deg),
+            RevoluteDH(alpha=-pi / 2, qlim=shoulder_lim * deg)
         ]
 
-        super().__init__(Links, name="Cyton Gamma 300", manufacturer="Robai")
+        self._links = links
+
+        super().__init__(self._links, name="Cyton Gamma 300", manufacturer="Robai")
+
+        self.num_joints = len(self.links) + 1
+
+        self.gripper_open_value = 0.0143
 
         # zero angles, L shaped pose
-        self._qz = np.zeros(8)  # create instance attribute
-        self._qz[-1] = 0.0143
+        self._qz = np.zeros(self.num_joints)  # create instance attribute
+        self._qz[-1] = self.gripper_open_value
+
+    def clamp_gripper_value(self, joint_value: float) -> float:
+        """
+        Set the joint position for the given joint index
+        :param joint_index: The index of the joint to set
+        :param joint_value: The desired joint value
+        :return: The updated joint value
+        """
+
+        # Check if the joint_value is within the joint limits and clamp if necessary
+        if joint_value < 0:
+            joint_value = 0
+        elif joint_value > self.gripper_open_value:
+            joint_value = self.gripper_open_value
+
+        return joint_value
 
     @property
     def qz(self):

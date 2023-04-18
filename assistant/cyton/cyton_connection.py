@@ -64,10 +64,10 @@ class CytonConnection:
 
 if __name__ == "__main__":
 
-    connection = CytonConnection()
+    connection = CytonConnection(send_port=8888, recv_port=8889)
 
     # connection.send_angles([0, 0.7, 0, 0.7, 0, 0.7, 0, 0.01])
 
     # connection.send_angles([0, 0, 0, 0.7, 0, 0.7, 0, 0.01])
 
-    connection.send_angles([0, 0, 0, 0, 0, 0, 0, 0.0])
+    connection.send_angles([0, 0, 0, 0.4, 0, 0, 0, 0.0])

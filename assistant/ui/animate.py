@@ -3,6 +3,8 @@ from spatialmath import SE3
 
 from assistant.cyton import CytonController, CytonGamma300, CytonConnection
 from assistant.items.Block import Block
+from assistant.items.locations import *
+from assistant.items.poses import poses
 
 
 def main():
@@ -21,32 +23,37 @@ def main():
     end_positions = [SE3([0.1, i/100, 0]) for i in range(5)]
 
     # Define the list of cubes and their properties
-    cubes = [Block(pos_id=idx, width=width, height=height, length=length, pose=position) for idx, position in enumerate(start_positions)]
-    # cubes = [
-    #     Block(pos_id=1,width=width,height=height,length=length,pose=SE3([0.1, 0, -0.08])),
-    #     Block(pos_id=2,width=width,height=height,length=length,pose=SE3([0.1, 0, -0.075])),
-    #     Block(pos_id=3,width=width,height=height,length=length,pose=SE3([0.1, 0, 0.0])),
-    #     Block(pos_id=4,width=width,height=height,length=length,pose=SE3([0.1, 0, 0.075])),
-    #     Block(pos_id=5,width=width,height=height,length=length,pose=SE3([0.1, 0, 0.15]))
-    # ]
-
-    # Define the list of drop-off locations
-    dropoff_locations = [
-        SE3([0, -0.15, 0.1]),
-        SE3([0, -0.075, 0.1]),
-        SE3([0, 0.0, 0.1]),
-        SE3([0, 0.075, 0.1]),
-        SE3([0, 0.15, 0.1])
+    cubes = [
+        Block(pos_id=1,
+              width=width,
+              height=height,
+              length=length),
+        Block(pos_id=2,
+              width=width,
+              height=height,
+              length=length),
+        Block(pos_id=3,
+              width=width,
+              height=height,
+              length=length),
+        Block(pos_id=4,
+              width=width,
+              height=height,
+              length=length),
+        Block(pos_id=5,
+              width=width,
+              height=height,
+              length=length)
     ]
 
-    client = CytonConnection()
+    client = CytonConnection(send_port=12001, recv_port=12002)
 
     # Create a CytonController instance and establish a connection
     controller = CytonController(robot=robot, client=client)
 
     # Loop through the items and their drop-off locations, and execute the pick-and-place sequence for each item
-    for cube, dropoff_location in zip(cubes, end_positions):
-        controller.pick_and_place(cube, dropoff_location)
+    for cube in cubes:
+        controller.pick_and_place(cube)
 
     # Robot returns home
     controller.go_home()
