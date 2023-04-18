@@ -9,6 +9,7 @@ from assistant.cyton.cyton_connection import CytonConnection
 from assistant.items.BaseItem import BaseItem
 
 from typing import List
+from tqdm import tqdm
 from spatialmath import SE3
 from roboticstoolbox import jtraj
 from roboticstoolbox.tools.trajectory import Trajectory
@@ -35,8 +36,6 @@ class CytonController:
         # TODO: This is probably not the starting point all the time. Find this out
         self.current_angles = self.robot.qz
 
-        print(f"Setting starting angles to {self.current_angles}")
-
         self.go_home()
 
     def __del__(self):
@@ -61,7 +60,7 @@ class CytonController:
         time.sleep(self.dt)
 
     def run_trajectory(self, traj: Trajectory):
-        for q in traj.q:
+        for q in tqdm(traj.q):
             self.set_angles(q)
 
     def set_pose(self, T: SE3):
@@ -83,6 +82,7 @@ class CytonController:
         Goes back to initial starting point
         :return: None
         """
+        print("Going Home")
         if (self.current_angles != self.robot.qz).all():
             traj = jtraj(self.current_angles, self.robot.qz, 100)
 
@@ -181,4 +181,13 @@ class CytonController:
 
 
 if __name__ == "__main__":
-    controller = CytonController(client=CytonConnection())
+    client = CytonConnection()
+    controller = CytonController(client=client)
+
+    time.sleep(5)
+
+    controller.set_angles([1.058, 1.061, 0.2, 1.309, 0.0, 0.811476, 0.0, 0.013])
+
+    # controller.set_angles([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01])
+
+    # controller.go_home()

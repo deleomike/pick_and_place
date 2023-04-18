@@ -1,6 +1,7 @@
 import time
 
 from assistant.sensors import MyoGestures, MyoController, LeapController
+from assistant.cyton.cyton_connection import CytonConnection
 from assistant.cyton.cyton_controller import CytonController
 from assistant.scheduler import Scheduler
 from assistant.items.Block import Block
@@ -23,10 +24,15 @@ def main():
     # Controllers #
     ###############
 
-    controller = CytonController(connect=True)
+    client = CytonConnection()
+
+    controller = CytonController(client=client)
 
     leap = LeapController()
     myo = MyoController()
+
+    leap.start()
+    myo.start()
 
     #################
     # State Machine #
@@ -141,7 +147,7 @@ def main():
                 state = 'waiting'
                 printed = 0
 
-            elif myo.movement_mode == 2:
+            elif myo.gesture == 2:
                 controller.go_human_show()
                 state = 'pickup_success'
                 printed = 0

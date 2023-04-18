@@ -29,13 +29,15 @@ class CytonGamma300(DHRobot):
             RevoluteDH(d=0, a=0.0718, alpha=-pi/2, qlim=elbow_lim),
             RevoluteDH(d=0, a=0.0718, alpha=pi/2, qlim=elbow_lim),
             RevoluteDH(d=0, a=0.1296, alpha=pi/2, qlim=elbow_lim),
-            RevoluteDH(alpha=-pi/2)
+            RevoluteDH(alpha=-pi/2),
+            RevoluteDH(alpha=-pi / 2)
         ]
 
         super().__init__(Links, name="Cyton Gamma 300", manufacturer="Robai")
 
         # zero angles, L shaped pose
-        self._qz = np.zeros(6)  # create instance attribute
+        self._qz = np.zeros(8)  # create instance attribute
+        self._qz[-1] = 0.0143
 
     @property
     def qz(self):

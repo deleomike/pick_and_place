@@ -6,3 +6,4 @@ watchdog
 matplotlib
 pytest
 pynput
+tqdm
