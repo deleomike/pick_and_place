@@ -1,7 +1,10 @@
 
 import enum
 import random
+
+from assistant.items.poses import poses
 from typing import Union
+from spatialmath import SE3
 
 NUM_BLOCKS = 5
 
@@ -21,27 +24,36 @@ start_locations = [[random.uniform(0, 1) for _ in range(3)] for _ in range(NUM_B
 
 
 class BlockStartLocations(enum.Enum):
-    B1 = start_locations[0]
-    B2 = start_locations[1]
-    B3 = start_locations[2]
-    B4 = start_locations[3]
-    B5 = start_locations[4]
+    B1 = SE3(0.1, 0.1, 0),  # Pose for cube 1
+    B2 = SE3(0.2, 0.1, 0),  # Pose for cube 2
+    B3 = SE3(0.3, 0.1, 0),  # Pose for cube 3
+    B4 = SE3(0.4, 0.1, 0),  # Pose for cube 4
+    B5 = SE3(0.5, 0.1, 0),  # Pose for cube 5
+    # B2 = start_locations[1]
+    # B3 = start_locations[2]
+    # B4 = start_locations[3]
+    # B5 = start_locations[4]
 
 # Generate random end locations
 end_locations = [[random.uniform(0, 1) for _ in range(3)] for _ in range(NUM_BLOCKS)]
 
 class BlockEndLocations(enum.Enum):
-    A = end_locations[0]
-    B = end_locations[1]
-    C = end_locations[2]
-    D = end_locations[3]
-    E = end_locations[4]
+    A = SE3(0.1, 0.1, 0),  # Pose for cube 1
+    B = SE3(0.2, 0.1, 0),  # Pose for cube 2
+    C = SE3(0.3, 0.1, 0),  # Pose for cube 3
+    D = SE3(0.4, 0.1, 0),  # Pose for cube 4
+    E = SE3(0.5, 0.1, 0),  # Pose for cube 5
+    # A = end_locations[0]
+    # B = end_locations[1]
+    # C = end_locations[2]
+    # D = end_locations[3]
+    # E = end_locations[4]
 
-loc_1 = Union[BlockStartLocations.B1, BlockEndLocations.A]
-loc_2 = Union[BlockStartLocations.B2, BlockEndLocations.B]
-loc_3 = Union[BlockStartLocations.B3, BlockEndLocations.C]
-loc_4 = Union[BlockStartLocations.B4, BlockEndLocations.D]
-loc_5 = Union[BlockStartLocations.B5, BlockEndLocations.E]
+loc_1 = (BlockStartLocations.B1, BlockEndLocations.A)
+loc_2 = (BlockStartLocations.B2, BlockEndLocations.B)
+loc_3 = (BlockStartLocations.B3, BlockEndLocations.C)
+loc_4 = (BlockStartLocations.B4, BlockEndLocations.D)
+loc_5 = (BlockStartLocations.B5, BlockEndLocations.E)
 
 
 if __name__ == "__main__":

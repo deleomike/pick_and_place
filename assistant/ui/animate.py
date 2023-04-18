@@ -25,38 +25,28 @@ def main():
     # Define the list of cubes and their properties
     cubes = [
         Block(pos_id=1,
-              location=loc_1,
-              pose=poses[0],
               width=width,
               height=height,
               length=length),
         Block(pos_id=2,
-              location=loc_2,
-              pose=poses[1],
               width=width,
               height=height,
               length=length),
         Block(pos_id=3,
-              location=loc_3,
-              pose=poses[2],
               width=width,
               height=height,
               length=length),
         Block(pos_id=4,
-              location=loc_4,
-              pose=poses[3],
               width=width,
               height=height,
               length=length),
         Block(pos_id=5,
-              location=loc_5,
-              pose=poses[4],
               width=width,
               height=height,
               length=length)
     ]
 
-    client = CytonConnection()
+    client = CytonConnection(send_port=12001, recv_port=12002)
 
     # Create a CytonController instance and establish a connection
     controller = CytonController(robot=robot, client=client)
