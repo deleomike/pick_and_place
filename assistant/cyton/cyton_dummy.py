@@ -10,6 +10,23 @@ class CytonDummyServer(UDPServer):
     Will decode angle commands and print them to terminal
     """
 
+    def __init__(self, listen_port: int = 8889, verbose: bool = True, round_to: int = 4):
+        super().__init__(listen_port=listen_port)
+
+        self._current_angles = np.zeros(8).tolist()
+        self.verbose = verbose
+
+        self.round = round_to
+
+    @property
+    def current_angles(self):
+        return self._current_angles
+
+    @current_angles.setter
+    def current_angles(self, arr: np.array):
+        self._current_angles = arr.round(self.round)
+
+
     def run(self):
         while True:
             bytesAddressPair = self.sock.recvfrom(self.buffer_size)
@@ -18,7 +35,8 @@ class CytonDummyServer(UDPServer):
 
             address = bytesAddressPair[1]
 
-            q = np.frombuffer(message)
+            self.current_angles = np.frombuffer(message)
 
-            output = f"Received command from {address} \n    {q}"
-            print(output)
+            if self.verbose:
+                output = f"Received command from {address} \n    {self.current_angles}"
+                print(output)
