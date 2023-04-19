@@ -1,3 +1,5 @@
+import time
+
 from assistant.sensors.SensorController import SensorController
 
 
@@ -20,5 +22,11 @@ if __name__ == "__main__":
 
     leap.start()
 
-    while True:
-        print(leap.finger_mode)
+    time.sleep(3)
+
+    # leap.stop()
+
+    leap.join()
+
+    # while True:
+    #     print(leap.finger_mode)

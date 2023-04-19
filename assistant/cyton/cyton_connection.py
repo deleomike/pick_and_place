@@ -3,6 +3,7 @@ import socket
 import numpy as np
 
 from typing import List
+from assistant.networking import UDPServer, UDPClient
 
 
 class CytonConnection:
@@ -12,43 +13,17 @@ class CytonConnection:
         self.recv_port = recv_port
         self.send_port = send_port
 
-        self.send_sock: socket.socket = None
-        self.recv_sock: socket.socket = None
+        self.client = UDPClient(ip=self.ip, port=self.send_port)
+        self.listener = UDPServer(ip=self.ip, listen_port=self.recv_port)
 
-        self.connect()
+        self.listener.start()
 
     def __del__(self):
-        self.close_sockets()
+        self.disconnect()
 
-    def _create_socket_(self, port):
-        sock = socket.socket(socket.AF_INET,  # Internet
-                             socket.SOCK_DGRAM)  # UDP
-
-        print(f"Establishing Connection to {self.ip}:{port}")
-
-        sock.connect((self.ip, port))
-
-        sock.setblocking(0)
-
-        return sock
-
-    def close_sockets(self):
-        if self.send_sock is not None:
-            self.send_sock.close()
-
-        if self.recv_sock is not None:
-            self.recv_sock.close()
-
-    def connect(self):
-        """
-        Establishes a connection to the robot
-        :return: True/False whether the connection was successful
-        """
-
-        self.close_sockets()
-
-        self.send_sock = self._create_socket_(self.send_port)
-        self.recv_sock = self._create_socket_(self.recv_port)
+    def disconnect(self):
+        self.client.disconnect()
+        self.listener.disconnect()
 
     def send_angles(self, q: List[float]):
 
@@ -56,7 +31,7 @@ class CytonConnection:
         data = data.view(np.uint8)
 
         try:
-            self.send_sock.send(data)
+            self.client.sock.send(data)
         except Exception as e:
             print(f"Could not send data to {self.ip}:{self.send_port} {e}")
             raise e

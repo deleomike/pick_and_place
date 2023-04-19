@@ -1,8 +1,11 @@
 import collections
+import time
+import sys
 
 import numpy as np
 
-from assistant.networking.UDPServer import UDPServer
+from threading import Lock
+from assistant.networking import UDPServer, UDPClient
 
 
 class SensorController(UDPServer):
@@ -19,6 +22,8 @@ class SensorController(UDPServer):
         self._value_ = 0
 
         self.running = True
+
+        self.lock = Lock()
 
     def __del__(self):
         self.stop()
@@ -46,11 +51,27 @@ class SensorController(UDPServer):
         """
         Stops the running thread
         """
-        self.running = False
+        print(f"Stopping thread listening on port {self.port}")
+        with self.lock:
+            self.running = False
+
+            # Send a packet to unblock the socket pipeline
+            temp_client = UDPClient(ip=self.ip, port=self.port)
+            temp_client.sock.send(np.array([-1], dtype=np.int8))
+
+            time.sleep(1)
+
+            self.disconnect()
 
     def run(self):
-        while self.running:
+        while True:
             self._read_data_()
 
             self._value_ = self.get_most_frequent()
+
+            with self.lock:
+                if not self.running:
+                    print(f"THREAD: Stopping Main Thread Listening on {self.ip}:{self.port}")
+                    sys.stdout.flush()
+                    break
 
