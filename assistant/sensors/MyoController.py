@@ -4,8 +4,12 @@ from assistant.sensors.MyoGestures import MyoGestures
 
 import time
 
+
 class MyoController(SensorController):
     """
+    MyoBand controller
+
+    Listens to the myoband and stores its results
     """
 
     def __init__(self, listen_port: int = 5006, rolling_buffer_size: int = 10):
