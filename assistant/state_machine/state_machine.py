@@ -1,0 +1,284 @@
+import time
+
+from enum import Enum
+from pynput import keyboard
+from assistant.cyton import CytonConnection, CytonController
+from assistant.sensors import LeapController, MyoController, MyoGestures
+
+
+class State(Enum):
+    WAITING = "waiting"
+
+
+class PickPlaceStateMachine:
+
+    def __init__(self, controller: CytonController,
+                 leap_controller: LeapController,
+                 myo_controller: MyoController):
+
+        self.controller = controller
+        self.leap = leap_controller
+        self.myo = myo_controller
+        self.keyboard_listener = keyboard.Listener(on_press=self.on_press)
+
+        self.keyboard_listener.start()
+        self.leap.start()
+        self.myo.start()
+
+        self.state = "waiting"
+        # TODO: This param seems unnecessary
+        self.save_state = self.state
+        self.space = False
+
+        self.pickup_number = 0
+        self.printed = 0
+        self.printed_pause = 0
+        self.number_good_pickup = 0
+        self.number_bad_pickup = 0
+
+    def on_press(self, key):
+        if key == keyboard.Key.space:
+            self.space ^= True
+        else:
+            self.space ^= False
+
+    def run(self):
+
+        while True:
+
+            if not self.space:
+                self.printed_pause = 0
+
+                if self.state == 'waiting':
+                    print("waiting for pickup location")
+                    if self.leap.finger_mode == 1:
+                        self.go_one_pick()
+                    elif self.leap.finger_mode == 2:
+                        self.go_two_pick()
+                    elif self.leap.finger_mode == 3:
+                        self.go_three_pick()
+                    elif self.leap.finger_mode == 4:
+                        self.go_four_pick()
+                    if self.leap.finger_mode == 5 or self.leap.finger_mode == 0:
+                        self.state = 'waiting'
+                    else:
+                        self.pickup_number = self.leap.finger_mode
+                        self.state = 'pickup'
+
+                elif self.state == 'pickup':
+                    controller.pickup()
+                    print("Going to user for inspection")
+                    state = 'inspect'
+
+                elif self.state == 'inspect':
+                    if self.printed == 0:
+                        self.go_human_show()
+                        print("waiting for inspection")
+                        self.printed = 1
+                    if self.myo.gesture == 4:
+                        self.state = 'pickup_fail'
+                        print("Failed pickup")
+                        self.printed = 0
+                        self.number_bad_pickup = self.number_bad_pickup + 1
+                    elif self.myo.gesture == 3:
+                        self.state = 'pickup_success'
+                        print("Successful pickup")
+                        self.number_good_pickup = self.number_good_pickup + 1
+                        self.printed = 0
+                elif self.state == 'pickup_fail':
+
+                    if self.pickup_number == 1:
+                        self.go_one_place()
+                    elif self.pickup_number == 2:
+                        self.go_two_place()
+                    elif self.pickup_number == 3:
+                        self.go_three_place()
+                    elif self.pickup_number == 4:
+                        self.go_four_place()
+                    self.state = 'drop'
+
+                elif self.state == 'pickup_success':
+                    print("waiting for drop-off location")
+
+                    if self.leap.finger_mode == 1:
+                        self.go_one_place()
+                        self.state = 'drop'
+                    elif self.leap.finger_mode == 2:
+                        self.go_two_place()
+                        self.state = 'drop'
+                    elif self.leap.finger_mode == 3:
+                        self.go_three_place()
+                        self.state = 'drop'
+                    elif self.leap.finger_mode == 4:
+                        self.go_four_place()
+                        self.state = 'drop'
+                    elif self.leap.finger_mode == 5:
+                        self.go_human_place()
+                        print("Dropping object")
+                        controller.drop()
+                        time.sleep(1.5)
+                        self.go_home()
+                        self.state = 'waiting'
+                        self.printed = 0
+                elif self.state == 'drop':
+                    if self.printed == 0:
+                        print("waiting for drop-off approval")
+                        self.printed = 1
+                    if self.myo.gesture == 1:
+                        print("Dropping object")
+                        self.controller.drop()
+                        time.sleep(1.5)
+                        self.controller.go_home()
+                        self.state = 'waiting'
+                        self.printed = 0
+                    elif self.myo.gesture == 2:
+                        self.state = 'failed_drop'
+                        self.printed = 0
+                elif self.state == 'failed_drop':
+                    if self.printed == 0:
+                        print("waiting for new drop-off location")
+                        self.printed = 1
+                    if self.leap.finger_mode == 1:
+                        self.go_intermediate()
+                        time.sleep(2)
+                        self.go_one_place()
+                        self.state = 'drop'
+                        self.printed = 0
+                    elif self.leap.finger_mode == 2:
+                        self.go_intermediate()
+                        time.sleep(2)
+                        self.go_two_place()
+                        self.state = 'drop'
+                        self.printed = 0
+                    elif self.leap.finger_mode == 3:
+                        self.go_intermediate()
+                        time.sleep(2)
+                        self.go_three_place()
+                        self.state = 'drop'
+                        self.printed = 0
+                    elif self.leap.finger_mode == 4:
+                        self.go_intermediate()
+                        time.sleep(2)
+                        self.go_four_place()
+                        self.state = 'drop'
+                        self.printed = 0
+                    elif self.leap.finger_mode == 5:
+                        self.go_intermediate()
+                        time.sleep(2)
+                        self.go_human_place()
+                        print("Dropping object")
+                        controller.drop()
+                        time.sleep(1.5)
+                        self.go_home()
+                        self.state = 'waiting'
+                        self.printed = 0
+                time.sleep(5)
+
+            else:
+                if self.printed_pause == 0:
+                    print("Pausing for now")
+                    self.printed_pause = 1
+                pass
+
+    def go_home(self):
+
+        self.controller.go_home()
+        self.save_state = "home"
+        print("Going to home")
+
+    def go_one_pick(self):
+        self.controller.set_angles([1.058, 1.061, 0.0, 1.309, 0.0, 0.811476, 0.0, 0.013])
+        self.save_state = "one-pick"
+        print("Going to one")
+
+    def go_two_pick(self):
+        self.controller.set_angles([0.557, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.013])
+        self.save_state = "two-pick"
+        print("Going to two")
+
+    def go_three_pick(self):
+        self.controller.set_angles([0.0, 0.979, 0.0, 1.46989, 0.0, 0.811476, 0.0, 0.013])
+        self.save_state = "three-pick"
+        print("Going to three")
+
+    def go_four_pick(self):
+        self.controller.set_angles([-0.5011, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.013])
+        self.save_state = "four-pick"
+        print("Going to four")
+
+    def go_one_place(self):
+        self.controller.set_angles([1.058, 1.061, 0.0, 1.309, 0.0, 0.811476, 0.0, 0.01])
+        self.save_state = "one-place"
+        print("Going to one")
+
+    def go_two_place(self):
+        self.controller.set_angles([0.557, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.01])
+        self.save_state = "two-place"
+        print("Going to two")
+
+    def go_three_place(self):
+        self.controller.set_angles([0.0, 0.979, 0.0, 1.46989, 0.0, 0.811476, 0.0, 0.01])
+        self.save_state = "three-place"
+        print("Going to three")
+
+    def go_four_place(self):
+        self.controller.set_angles([-0.5011, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.01])
+        self.save_state = "four-place"
+        print("Going to four")
+
+    def go_human_show(self):
+        self.controller.set_angles([0.0, -0.7, 0.0, -0.7, 0.0, -0.7, 0.0, 0.01])
+        self.save_state = "human-show"
+        print("Going to human")
+
+    def go_human_place(self):
+        self.controller.set_angles([0.0, -0.7, 0.0, -0.7, 0.0, -0.7, 0.0, 0.01])
+        self.save_state = "human-place"
+        print("Going to human")
+
+    def go_intermediate(self):
+        self.controller.set_angles([0.33, 0.53, 0.0, 0.82, 0.0, 0.72, 0.0, 0.01])
+
+    def pickup(self):
+        if self.save_state == "one-pick":
+            self.controller.set_angles([1.058, 1.061, 0.0, 1.309, 0.0, 0.811476, 0.0, 0.01])
+            print("Picking up cuboid from block 1")
+
+        elif self.save_state == "two-pick":
+            self.controller.set_angles([0.557, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.01])
+            print("Picking up cuboid from block 2")
+
+        elif self.save_state == "three-pick":
+            self.controller.set_angles([0.0, 0.979, 0.0, 1.46989, 0.0, 0.811476, 0.0, 0.01])
+            print("Picking up cuboid from block 3")
+
+        elif self.save_state == "four-pick":
+            self.controller.set_angles([-0.5011, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.01])
+            print("Picking up cuboid from block 4")
+
+        else:
+            print("Command not understood")
+
+    def drop(self):
+        if self.save_state == "one-place":
+            self.controller.set_angles([1.058, 1.061, 0.0, 1.309, 0.0, 0.811476, 0.0, 0.013])
+            print("Placing cuboid in block 1")
+
+        elif self.save_state == "two-place":
+            self.controller.set_angles([0.557, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.013])
+            print("Placing cuboid in block 2")
+
+        elif self.save_state == "three-place":
+            self.controller.set_angles([0.0, 0.979, 0.0, 1.46989, 0.0, 0.811476, 0.0, 0.013])
+            print("Placing cuboid in block 3")
+
+        elif self.save_state == "four-place":
+            self.controller.set_angles([-0.5011, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.013])
+            print("Placing cuboid in block 4")
+
+        elif self.save_state == "human-drop":
+            self.controller.set_angles([0.0, -0.7, 0.0, -0.7, 0.0, -0.7, 0.0, 0.013])
+            print("Placing cuboid in operator hand")
+
+        else:
+            print("Command not understood")
