@@ -85,19 +85,19 @@ class PickPlaceStateMachine:
                 elif self.state == 'pickup':
                     self.pickup()
                     print("Going to user for inspection")
-                    state = 'inspect'
+                    self.state = 'inspect'
 
                 elif self.state == 'inspect':
                     if not self.printed:
                         self.go_human_show()
                         print("waiting for inspection")
                         self.printed = True
-                    if self.myo.gesture == 4:
+                    if self.myo.gesture == MyoGestures.WRIST_OUT:
                         self.state = 'pickup_fail'
                         print("Failed pickup")
                         self.printed = False
                         self.number_bad_pickup = self.number_bad_pickup + 1
-                    elif self.myo.gesture == 3:
+                    elif self.myo.gesture == MyoGestures.WRIST_IN:
                         self.state = 'pickup_success'
                         print("Successful pickup")
                         self.number_good_pickup = self.number_good_pickup + 1
@@ -143,14 +143,14 @@ class PickPlaceStateMachine:
                     if not self.printed:
                         print("waiting for drop-off approval")
                         self.printed = True
-                    if self.myo.gesture == 1:
+                    if self.myo.gesture == MyoGestures.FLEXION:
                         print("Dropping object")
-                        self.controller.drop()
+                        self.drop()
                         time.sleep(1.5)
                         self.controller.go_home()
                         self.state = 'waiting'
                         self.printed = False
-                    elif self.myo.gesture == 2:
+                    elif self.myo.gesture == MyoGestures.EXTENSION:
                         self.state = 'failed_drop'
                         self.printed = False
 

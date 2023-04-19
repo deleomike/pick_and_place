@@ -21,7 +21,7 @@ class SensorController(UDPServer):
 
         self._value_ = 0
 
-        self.running = True
+        self.running = False
 
         self.lock = Lock()
 
@@ -51,19 +51,23 @@ class SensorController(UDPServer):
         """
         Stops the running thread
         """
-        print(f"Stopping thread listening on port {self.port}")
-        with self.lock:
-            self.running = False
+        if self.running:
+            print(f"Stopping thread listening on port {self.port}")
+            with self.lock:
+                self.running = False
 
-            # Send a packet to unblock the socket pipeline
-            temp_client = UDPClient(ip=self.ip, port=self.port)
-            temp_client.sock.send(np.array([-1], dtype=np.int8))
+                # Send a packet to unblock the socket pipeline
+                temp_client = UDPClient(ip=self.ip, port=self.port)
+                temp_client.sock.send(np.array([-1], dtype=np.int8))
 
-            time.sleep(1)
+                time.sleep(1)
 
-            self.disconnect()
+                self.disconnect()
+        else:
+            print("Thread is not running.")
 
     def run(self):
+        self.running = True
         while True:
             self._read_data_()
 
