@@ -197,14 +197,12 @@ class CytonController:
         save_state = "human-show"
         print("Going to human")
 
-
     def go_human_place(self):
         # self.set_pose(self.robot.qz)
         global save_state
         self.set_angles([0.0, -0.7, 0.0, -0.7, 0.0, -0.7, 0.0, 0.01])
         save_state = "human-place"
         print("Going to human")
-
 
     def go_intermediate(self):
         self.set_angles([0.33, 0.53, 0.0, 0.82, 0.0, 0.72, 0.0, 0.01])

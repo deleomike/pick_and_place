@@ -22,6 +22,9 @@ class UDPServer(threading.Thread):
         print(f"UDP server up and listening at {self.ip}:{self.ip}")
 
     def __del__(self):
+        self.disconnect()
+
+    def disconnect(self):
         self.sock.close()
 
     def run(self):

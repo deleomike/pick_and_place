@@ -8,6 +8,7 @@ from assistant.sensors import LeapController, MyoController, MyoGestures
 
 class State(Enum):
     WAITING = "waiting"
+    PICKUP = "pickup"
 
 
 class PickPlaceStateMachine:
@@ -26,15 +27,15 @@ class PickPlaceStateMachine:
         self.myo.start()
 
         self.state = "waiting"
-        # TODO: This param seems unnecessary
+        # TODO: What is the difference between save state and state?
         self.save_state = self.state
         self.space = False
 
-        self.pickup_number = 0
-        self.printed = 0
-        self.printed_pause = 0
-        self.number_good_pickup = 0
-        self.number_bad_pickup = 0
+        self.pickup_number: int = 0
+        self.printed: bool = False
+        self.printed_pause: bool = False
+        self.number_good_pickup: int = 0
+        self.number_bad_pickup: int = 0
 
     def on_press(self, key):
         if key == keyboard.Key.space:
@@ -42,12 +43,17 @@ class PickPlaceStateMachine:
         else:
             self.space ^= False
 
+    def __del__(self):
+        self.controller.disconnect()
+        self.leap.stop()
+        self.myo.stop()
+
     def run(self):
 
         while True:
 
             if not self.space:
-                self.printed_pause = 0
+                self.printed_pause = False
 
                 if self.state == 'waiting':
                     print("waiting for pickup location")
@@ -66,25 +72,26 @@ class PickPlaceStateMachine:
                         self.state = 'pickup'
 
                 elif self.state == 'pickup':
-                    controller.pickup()
+                    self.pickup()
                     print("Going to user for inspection")
                     state = 'inspect'
 
                 elif self.state == 'inspect':
-                    if self.printed == 0:
+                    if not self.printed:
                         self.go_human_show()
                         print("waiting for inspection")
-                        self.printed = 1
+                        self.printed = True
                     if self.myo.gesture == 4:
                         self.state = 'pickup_fail'
                         print("Failed pickup")
-                        self.printed = 0
+                        self.printed = False
                         self.number_bad_pickup = self.number_bad_pickup + 1
                     elif self.myo.gesture == 3:
                         self.state = 'pickup_success'
                         print("Successful pickup")
                         self.number_good_pickup = self.number_good_pickup + 1
-                        self.printed = 0
+                        self.printed = True
+
                 elif self.state == 'pickup_fail':
 
                     if self.pickup_number == 1:
@@ -115,70 +122,71 @@ class PickPlaceStateMachine:
                     elif self.leap.finger_mode == 5:
                         self.go_human_place()
                         print("Dropping object")
-                        controller.drop()
+                        self.drop()
                         time.sleep(1.5)
                         self.go_home()
                         self.state = 'waiting'
-                        self.printed = 0
+                        self.printed = False
+
                 elif self.state == 'drop':
-                    if self.printed == 0:
+                    if not self.printed:
                         print("waiting for drop-off approval")
-                        self.printed = 1
+                        self.printed = True
                     if self.myo.gesture == 1:
                         print("Dropping object")
                         self.controller.drop()
                         time.sleep(1.5)
                         self.controller.go_home()
                         self.state = 'waiting'
-                        self.printed = 0
+                        self.printed = False
                     elif self.myo.gesture == 2:
                         self.state = 'failed_drop'
-                        self.printed = 0
+                        self.printed = False
+
                 elif self.state == 'failed_drop':
-                    if self.printed == 0:
+                    if not self.printed:
                         print("waiting for new drop-off location")
-                        self.printed = 1
+                        self.printed = True
                     if self.leap.finger_mode == 1:
                         self.go_intermediate()
                         time.sleep(2)
                         self.go_one_place()
                         self.state = 'drop'
-                        self.printed = 0
+                        self.printed = False
                     elif self.leap.finger_mode == 2:
                         self.go_intermediate()
                         time.sleep(2)
                         self.go_two_place()
                         self.state = 'drop'
-                        self.printed = 0
+                        self.printed = False
                     elif self.leap.finger_mode == 3:
                         self.go_intermediate()
                         time.sleep(2)
                         self.go_three_place()
                         self.state = 'drop'
-                        self.printed = 0
+                        self.printed = False
                     elif self.leap.finger_mode == 4:
                         self.go_intermediate()
                         time.sleep(2)
                         self.go_four_place()
                         self.state = 'drop'
-                        self.printed = 0
+                        self.printed = False
                     elif self.leap.finger_mode == 5:
                         self.go_intermediate()
                         time.sleep(2)
                         self.go_human_place()
                         print("Dropping object")
-                        controller.drop()
+                        self.drop()
                         time.sleep(1.5)
                         self.go_home()
                         self.state = 'waiting'
-                        self.printed = 0
+                        self.printed = False
                 time.sleep(5)
 
             else:
-                if self.printed_pause == 0:
+                if not self.printed_pause:
                     print("Pausing for now")
-                    self.printed_pause = 1
-                pass
+                    self.printed_pause = True
 
     def go_home(self):
 
