@@ -20,6 +20,9 @@ class SensorController(UDPServer):
 
         self.running = True
 
+    def __del__(self):
+        self.stop()
+
     def _read_data_(self) -> int:
         """
         Internal function. Reads data from the socket and appends it to the circular buffer

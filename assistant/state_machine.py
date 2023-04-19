@@ -13,7 +13,8 @@ class State(Enum):
 
 class PickPlaceStateMachine:
 
-    def __init__(self, controller: CytonController,
+    def __init__(self,
+                 controller: CytonController,
                  leap_controller: LeapController,
                  myo_controller: MyoController):
 
@@ -37,16 +38,16 @@ class PickPlaceStateMachine:
         self.number_good_pickup: int = 0
         self.number_bad_pickup: int = 0
 
+    def __del__(self):
+        self.controller.disconnect()
+        self.leap.stop()
+        self.myo.stop()
+
     def on_press(self, key):
         if key == keyboard.Key.space:
             self.space ^= True
         else:
             self.space ^= False
-
-    def __del__(self):
-        self.controller.disconnect()
-        self.leap.stop()
-        self.myo.stop()
 
     def run(self):
 
