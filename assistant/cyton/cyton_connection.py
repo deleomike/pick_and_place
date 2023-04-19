@@ -16,7 +16,7 @@ class CytonConnection:
         self.client = UDPClient(ip=self.ip, port=self.send_port)
         self.listener = UDPServer(ip=self.ip, listen_port=self.recv_port)
 
-        self.listener.start()
+        # self.listener.start()
 
     def __del__(self):
         self.disconnect()

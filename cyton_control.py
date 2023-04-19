@@ -13,11 +13,11 @@ def main():
     # Plan #
     ########
 
-    blocks = [Block(idx + 1) for idx, e in enumerate(BlockEndLocations)]
-    # blocks = [Block(1, color="blue", location=BlockEndLocations.A)]
-    scheduler = Scheduler(blocks)
-
-    print("PLAN: ", scheduler.execute())
+    # blocks = [Block(idx + 1) for idx, e in enumerate(BlockEndLocations)]
+    # # blocks = [Block(1, color="blue", location=BlockEndLocations.A)]
+    # scheduler = Scheduler(blocks)
+    #
+    # print("PLAN: ", scheduler.execute())
 
     ###############
     # Controllers #

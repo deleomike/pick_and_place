@@ -17,7 +17,14 @@ class UDPServer(threading.Thread):
 
         # Bind to address and ip
 
-        self.sock.bind((self.ip, self.port))
+        print(f"Binding to {self.ip}:{self.port}")
+
+
+        try:
+            self.sock.bind((self.ip, self.port))
+        except OSError as e:
+            print(f"Could not bind to {self.ip}:{self.port}")
+            raise e
 
         print(f"UDP server up and listening at {self.ip}:{self.port}")
 
