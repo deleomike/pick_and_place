@@ -39,6 +39,9 @@ class PickPlaceStateMachine:
         self.number_bad_pickup: int = 0
 
     def __del__(self):
+        self.disconnect()
+
+    def disconnect(self):
         self.controller.disconnect()
         self.leap.stop()
         self.myo.stop()
@@ -50,6 +53,13 @@ class PickPlaceStateMachine:
             self.space ^= False
 
     def run(self):
+        try:
+            self._state_machine_loop_()
+        except KeyboardInterrupt:
+            print("Caught CTRL+C. Shutting Down.")
+            self.disconnect()
+
+    def _state_machine_loop_(self):
 
         while True:
 
@@ -291,3 +301,20 @@ class PickPlaceStateMachine:
 
         else:
             print("Command not understood")
+
+
+if __name__ == "__main__":
+    client = CytonConnection()
+
+    controller = CytonController(client=client)
+
+    leap = LeapController()
+    myo = MyoController()
+
+    #################
+    # State Machine #
+    #################
+
+    state_machine = PickPlaceStateMachine(controller=controller, leap_controller=leap, myo_controller=myo)
+
+    state_machine.run()

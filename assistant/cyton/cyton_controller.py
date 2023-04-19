@@ -43,7 +43,7 @@ class CytonController:
 
     def disconnect(self):
         if self.client is not None:
-            self.client.close_sockets()
+            self.client.disconnect()
 
     ###############################
     # Sending Commands and Angles #
