@@ -7,6 +7,7 @@ import time
 from statistics import mode
 from pynput import keyboard
 from assistant.sensors import MyoController, MyoGestures, LeapController
+from assistant.cyton import CytonConnection, CytonController
 
 save_state = "waiting"
 space = False
@@ -255,7 +256,9 @@ class CytonController:
 
 if __name__ == "__main__":
 
-    controller = CytonController(connect=True)
+    client = CytonConnection(send_port=8888, recv_port=8889)
+
+    controller = CytonController(client=client)
 
     leap = LeapController()
     myo = MyoController()
