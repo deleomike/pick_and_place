@@ -67,20 +67,31 @@ class PickPlaceStateMachine:
                 self.printed_pause = False
 
                 if self.state == 'waiting':
-                    print("waiting for pickup location")
+                    if not self.printed:
+                        print("waiting for pickup location")
+                        self.printed = True
                     if self.leap.finger_mode == 1:
                         self.go_one_pick()
+                        self.pickup_number = 1
+                        self.printed = False
+                        self.state = 'pickup'
                     elif self.leap.finger_mode == 2:
                         self.go_two_pick()
+                        self.pickup_number = 2
+                        self.printed = False
+                        self.state = 'pickup'
                     elif self.leap.finger_mode == 3:
                         self.go_three_pick()
+                        self.pickup_number = 3
+                        self.printed = False
+                        self.state = 'pickup'
                     elif self.leap.finger_mode == 4:
                         self.go_four_pick()
-                    if self.leap.finger_mode == 5 or self.leap.finger_mode == 0:
-                        self.state = 'waiting'
-                    else:
-                        self.pickup_number = self.leap.finger_mode
+                        self.pickup_number = 4
+                        self.printed = False
                         self.state = 'pickup'
+                    elif self.leap.finger_mode == 5 or self.leap.finger_mode == 0:
+                        self.state = 'waiting'
 
                 elif self.state == 'pickup':
                     self.pickup()
@@ -101,7 +112,7 @@ class PickPlaceStateMachine:
                         self.state = 'pickup_success'
                         print("Successful pickup")
                         self.number_good_pickup = self.number_good_pickup + 1
-                        self.printed = True
+                        self.printed = False
 
                 elif self.state == 'pickup_fail':
 
@@ -116,20 +127,25 @@ class PickPlaceStateMachine:
                     self.state = 'drop'
 
                 elif self.state == 'pickup_success':
-                    print("waiting for drop-off location")
-
+                    if not self.printed:
+                        print("waiting for drop-off location")
+                        self.printed = True
                     if self.leap.finger_mode == 1:
                         self.go_one_place()
                         self.state = 'drop'
+                        self.printed = False
                     elif self.leap.finger_mode == 2:
                         self.go_two_place()
                         self.state = 'drop'
+                        self.printed = False
                     elif self.leap.finger_mode == 3:
                         self.go_three_place()
                         self.state = 'drop'
+                        self.printed = False
                     elif self.leap.finger_mode == 4:
                         self.go_four_place()
                         self.state = 'drop'
+                        self.printed = False
                     elif self.leap.finger_mode == 5:
                         self.go_human_place()
                         print("Dropping object")
@@ -186,6 +202,7 @@ class PickPlaceStateMachine:
                         self.go_intermediate()
                         time.sleep(2)
                         self.go_human_place()
+                        time.sleep(6)
                         print("Dropping object")
                         self.drop()
                         time.sleep(1.5)
@@ -206,41 +223,57 @@ class PickPlaceStateMachine:
         print("Going to home")
 
     def go_one_pick(self):
-        self.controller.set_angles([1.058, 1.061, 0.0, 1.309, 0.0, 0.811476, 0.0, 0.013])
+        self.controller.set_angles([1.058, 1, 0.0, 1.309, 0.0, 0.811476, 0.0, 0.015])
+        time.sleep(5)
+        self.controller.set_angles([1.058, 1.08, 0.0, 1.309, 0.0, 0.811476, 0.0, 0.015])
         self.save_state = "one-pick"
         print("Going to one")
 
     def go_two_pick(self):
-        self.controller.set_angles([0.557, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.013])
+        self.controller.set_angles([0.557, 1, 0.0, 1.35, 0.0, 0.725, 0.0, 0.015])
+        time.sleep(5)
+        self.controller.set_angles([0.557, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.015])
         self.save_state = "two-pick"
         print("Going to two")
 
     def go_three_pick(self):
-        self.controller.set_angles([0.0, 0.979, 0.0, 1.46989, 0.0, 0.811476, 0.0, 0.013])
+        self.controller.set_angles([0.0, 0.97, 0.0, 1.46989, 0.0, 0.811476, 0.0, 0.015])
+        time.sleep(5)
+        self.controller.set_angles([0.0, 1.01, 0.0, 1.46989, 0.0, 0.811476, 0.0, 0.015])
         self.save_state = "three-pick"
         print("Going to three")
 
     def go_four_pick(self):
-        self.controller.set_angles([-0.5011, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.013])
+        self.controller.set_angles([-0.5011, 1, 0.0, 1.35, 0.0, 0.725, 0.0, 0.015])
+        time.sleep(5)
+        self.controller.set_angles([-0.5011, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.015])
         self.save_state = "four-pick"
         print("Going to four")
 
     def go_one_place(self):
-        self.controller.set_angles([1.058, 1.061, 0.0, 1.309, 0.0, 0.811476, 0.0, 0.01])
+        self.controller.set_angles([1.058, 1, 0.0, 1.309, 0.0, 0.811476, 0.0, 0.01])
+        time.sleep(6)
+        self.controller.set_angles([1.058, 1.08, 0.0, 1.309, 0.0, 0.811476, 0.0, 0.01])
         self.save_state = "one-place"
         print("Going to one")
 
     def go_two_place(self):
+        self.controller.set_angles([0.557, 1, 0.0, 1.35, 0.0, 0.725, 0.0, 0.01])
+        time.sleep(6)
         self.controller.set_angles([0.557, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.01])
         self.save_state = "two-place"
         print("Going to two")
 
     def go_three_place(self):
-        self.controller.set_angles([0.0, 0.979, 0.0, 1.46989, 0.0, 0.811476, 0.0, 0.01])
+        self.controller.set_angles([0.0, 0.97, 0.0, 1.46989, 0.0, 0.811476, 0.0, 0.01])
+        time.sleep(6)
+        self.controller.set_angles([0.0, 1.01, 0.0, 1.46989, 0.0, 0.811476, 0.0, 0.01])
         self.save_state = "three-place"
         print("Going to three")
 
     def go_four_place(self):
+        self.controller.set_angles([-0.5011, 1, 0.0, 1.35, 0.0, 0.725, 0.0, 0.01])
+        time.sleep(6)
         self.controller.set_angles([-0.5011, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.01])
         self.save_state = "four-place"
         print("Going to four")
@@ -260,19 +293,27 @@ class PickPlaceStateMachine:
 
     def pickup(self):
         if self.save_state == "one-pick":
-            self.controller.set_angles([1.058, 1.061, 0.0, 1.309, 0.0, 0.811476, 0.0, 0.01])
+            self.controller.set_angles([1.058, 1.08, 0.0, 1.309, 0.0, 0.811476, 0.0, 0.01])
+            time.sleep(5)
+            self.controller.set_angles([1.058, 1, 0.0, 1.309, 0.0, 0.811476, 0.0, 0.01])
             print("Picking up cuboid from block 1")
 
         elif self.save_state == "two-pick":
             self.controller.set_angles([0.557, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.01])
+            time.sleep(5)
+            self.controller.set_angles([0.557, 1, 0.0, 1.35, 0.0, 0.725, 0.0, 0.01])
             print("Picking up cuboid from block 2")
 
         elif self.save_state == "three-pick":
-            self.controller.set_angles([0.0, 0.979, 0.0, 1.46989, 0.0, 0.811476, 0.0, 0.01])
+            self.controller.set_angles([0.0, 1.01, 0.0, 1.46989, 0.0, 0.811476, 0.0, 0.01])
+            time.sleep(5)
+            self.controller.set_angles([0.0, 0.97, 0.0, 1.46989, 0.0, 0.811476, 0.0, 0.01])
             print("Picking up cuboid from block 3")
 
         elif self.save_state == "four-pick":
             self.controller.set_angles([-0.5011, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.01])
+            time.sleep(5)
+            self.controller.set_angles([-0.5011, 1, 0.0, 1.35, 0.0, 0.725, 0.0, 0.01])
             print("Picking up cuboid from block 4")
 
         else:
@@ -280,23 +321,31 @@ class PickPlaceStateMachine:
 
     def drop(self):
         if self.save_state == "one-place":
-            self.controller.set_angles([1.058, 1.061, 0.0, 1.309, 0.0, 0.811476, 0.0, 0.013])
+            self.controller.set_angles([1.058, 1.08, 0.0, 1.309, 0.0, 0.811476, 0.0, 0.015])
+            time.sleep(5)
+            self.controller.set_angles([1.058, 1, 0.0, 1.309, 0.0, 0.811476, 0.0, 0.015])
             print("Placing cuboid in block 1")
 
         elif self.save_state == "two-place":
-            self.controller.set_angles([0.557, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.013])
+            self.controller.set_angles([0.557, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.015])
+            time.sleep(5)
+            self.controller.set_angles([0.557, 1, 0.0, 1.35, 0.0, 0.725, 0.0, 0.015])
             print("Placing cuboid in block 2")
 
         elif self.save_state == "three-place":
-            self.controller.set_angles([0.0, 0.979, 0.0, 1.46989, 0.0, 0.811476, 0.0, 0.013])
+            self.controller.set_angles([0.0, 1.01, 0.0, 1.46989, 0.0, 0.811476, 0.0, 0.015])
+            time.sleep(5)
+            self.controller.set_angles([0.0, 0.97, 0.0, 1.46989, 0.0, 0.811476, 0.0, 0.015])
             print("Placing cuboid in block 3")
 
         elif self.save_state == "four-place":
-            self.controller.set_angles([-0.5011, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.013])
+            self.controller.set_angles([-0.5011, 1.0612, 0.0, 1.309, 0.0, 0.725, 0.0, 0.015])
+            time.sleep(5)
+            self.controller.set_angles([-0.5011, 1, 0.0, 1.35, 0.0, 0.725, 0.0, 0.015])
             print("Placing cuboid in block 4")
 
-        elif self.save_state == "human-drop":
-            self.controller.set_angles([0.0, -0.7, 0.0, -0.7, 0.0, -0.7, 0.0, 0.013])
+        elif self.save_state == "human-place":
+            self.controller.set_angles([0.0, -0.7, 0.0, -0.7, 0.0, -0.7, 0.0, 0.015])
             print("Placing cuboid in operator hand")
 
         else:

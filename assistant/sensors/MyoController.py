@@ -20,7 +20,10 @@ class MyoController(SensorController):
 
     @property
     def gesture(self):
-        return MyoGestures(self._value_)
+        self.count = 0
+        while self.count < 10:
+            pass
+        return MyoGestures(self.get_most_frequent())
 
 
 if __name__ == "__main__":

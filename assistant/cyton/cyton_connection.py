@@ -52,11 +52,11 @@ class CytonConnection:
             print(f"Could not send data to {self.ip}:{self.send_port} {e}")
             raise e
 
-        while wait:
-            if self.is_cyton_at_q(q=q):
-                break
-            else:
-                time.sleep(0.1)
+        # while wait:
+        #     if self.is_cyton_at_q(q=q):
+        #         break
+        #     else:
+        #         time.sleep(0.1)
 
 
 if __name__ == "__main__":

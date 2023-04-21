@@ -25,6 +25,8 @@ class SensorController(UDPServer):
 
         self.lock = Lock()
 
+        self.count = 0
+
     def __del__(self):
         self.stop()
 
@@ -37,6 +39,8 @@ class SensorController(UDPServer):
         value = data[0]
 
         self.rolling_buffer.append(value)
+
+        self.count += 1
 
         return value
 

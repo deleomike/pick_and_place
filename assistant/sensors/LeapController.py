@@ -14,7 +14,10 @@ class LeapController(SensorController):
 
     @property
     def finger_mode(self):
-        return self._value_
+        self.count = 0
+        while self.count < 10:
+            pass
+        return self.get_most_frequent()
 
 
 if __name__ == "__main__":
