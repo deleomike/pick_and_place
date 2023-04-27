@@ -15,7 +15,14 @@ class LeapController(SensorController):
     @property
     def finger_mode(self):
         self.count = 0
+        printed_pause = 0
         while self.count < 10:
+            while self.pause:
+                if not printed_pause:
+                    print('pausing for now')
+                    printed_pause = 1
+                self.count = 0
+            printed_pause = 0
             pass
         return self.get_most_frequent()
 

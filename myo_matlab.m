@@ -17,7 +17,7 @@ cd('..\..\MiniVIE')
 obj = MiniVIE;
 
 % CHANGE THIS TO MATCH YOUR TRAINING DATA FILE
-myDataFilename = 'C:\Users\HRIadmin\PycharmProjects\group1\kaufman_4_7_training.trainingData';
+myDataFilename = 'C:\Users\HRIadmin\PycharmProjects\pick_and_place\data\CH_PRJ_DATA_v2.trainingData';
  
 % Load training data file
 hData = PatternRecognition.TrainingData();

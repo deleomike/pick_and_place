@@ -26,6 +26,7 @@ class SensorController(UDPServer):
         self.lock = Lock()
 
         self.count = 0
+        self.pause = 0
 
     def __del__(self):
         self.stop()
@@ -43,6 +44,12 @@ class SensorController(UDPServer):
         self.count += 1
 
         return value
+
+    def set_pause(self):
+        if self.pause == 1:
+            self.pause = 0
+        else:
+            self.pause = 1
 
     def get_most_frequent(self):
         """

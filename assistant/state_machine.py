@@ -37,6 +37,10 @@ class PickPlaceStateMachine:
         self.printed_pause: bool = False
         self.number_good_pickup: int = 0
         self.number_bad_pickup: int = 0
+        self.number_pickups: int = 0
+        self.number_good_place: int = 0
+        self.number_bad_place: int = 0
+        self.number_place: int = 0
 
     def __del__(self):
         self.disconnect()
@@ -49,6 +53,7 @@ class PickPlaceStateMachine:
     def on_press(self, key):
         if key == keyboard.Key.space:
             self.space ^= True
+            self.leap.set_pause()
         else:
             self.space ^= False
 
