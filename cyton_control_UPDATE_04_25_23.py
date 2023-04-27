@@ -272,9 +272,10 @@ if __name__ == "__main__":
     # setup variables for metrics
     number_good_pickup = 0
     number_bad_pickup = 0
+    number_pickups = 0
     number_good_place = 0
     number_bad_place = 0
-
+    number_place = 0
 
     listener = keyboard.Listener(
         on_press=on_press)
@@ -471,6 +472,13 @@ if __name__ == "__main__":
                 printed_pause = 1
             pass
 
+    number_pickups = number_good_pickup + number_bad_pickup
+    number_place = number_good_place + number_bad_place
+    
+    
+   
+   
+   
     # controller.set_angles([0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0])
     # q = [0, 0.7, 0, 0.7, 0, 0.7, 0, 0.1]
     #
