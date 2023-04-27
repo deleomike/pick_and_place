@@ -12,7 +12,7 @@ class MyoController(SensorController):
     Listens to the myoband and stores its results
     """
 
-    def __init__(self, listen_port: int = 5006, rolling_buffer_size: int = 10):
+    def __init__(self, listen_port: int = 5006, rolling_buffer_size: int = 20):
 
         super().__init__(listen_port=listen_port, rolling_buffer_size=rolling_buffer_size)
 

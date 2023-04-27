@@ -108,6 +108,7 @@ class PickPlaceStateMachine:
                         self.go_human_show()
                         print("waiting for inspection")
                         self.printed = True
+                        time.sleep(5)
                     if self.myo.gesture == MyoGestures.WRIST_OUT:
                         self.state = 'pickup_fail'
                         print("Failed pickup")
