@@ -6,6 +6,9 @@ from matplotlib.animation import FuncAnimation
 # import updated variables from state_machine.py
 from state_machine import number_good_pickup, number_bad_pickup, number_good_place, number_bad_place
 
+
+# use exec(open('metrics.py').read()) in the state_machine while loop to call this function
+
 # make dataframe from variables and exporting to excel
 df = pd.DataFrame(columns = ['Pickup Success', 'Pickup Fail', 'Pickup Attempts', 'Place Success', 'Place Fail', 'Place Attempts'])
 df.loc[len(df)] = [number_good_pickup, number_bad_pickup, number_good_pickup+number_bad_pickup, number_good_place, number_bad_place, number_good_place+number_bad_place]
