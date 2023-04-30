@@ -11,10 +11,17 @@ from assistant.cyton.cyton_dummy import CytonDummyServer
 
 class CytonConnection:
 
-    def __init__(self, ip: str = "127.0.0.1", send_port: int = 8888, recv_port: int = 8889, verbose: bool = False):
+    def __init__(self,
+                 ip: str = "127.0.0.1",
+                 send_port: int = 8888,
+                 recv_port: int = 8889,
+                 verbose: bool = False,
+                 wait: bool = True):
         self.ip = ip
         self.recv_port = recv_port
         self.send_port = send_port
+
+        self.wait = wait
 
         self.client = UDPClient(ip=self.ip, port=self.send_port)
         self.listener = CytonDummyServer(listen_port=self.recv_port, round_to=4, verbose=verbose )
@@ -38,7 +45,7 @@ class CytonConnection:
 
         return (q_np == ground_truth_angles).all()
 
-    def send_angles(self, q: List[float], wait: bool = True):
+    def send_angles(self, q: List[float]):
         """
         Sends angles to cyton. Can also wait for cyton reach these angles
         """
@@ -52,11 +59,14 @@ class CytonConnection:
             print(f"Could not send data to {self.ip}:{self.send_port} {e}")
             raise e
 
-        # while wait:
-        #     if self.is_cyton_at_q(q=q):
-        #         break
-        #     else:
-        #         time.sleep(0.1)
+        for _ in range(50):
+            if self.is_cyton_at_q(q=q):
+                print("Done waiting.")
+                break
+            elif not self.wait:
+                break
+            else:
+                time.sleep(0.1)
 
 
 if __name__ == "__main__":
@@ -67,7 +77,7 @@ if __name__ == "__main__":
 
     # connection.send_angles([0, 0, 0, 0.7, 0, 0.7, 0, 0.01])
 
-    connection.send_angles([0, 0, 0, 0.4, 0, 0, 0, 0.0])
+    connection.send_angles([0, 0, 0, 0, 0, 0, 0, 0.0])
 
     print("Done")
 

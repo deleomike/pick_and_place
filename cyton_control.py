@@ -23,7 +23,7 @@ def main():
     # Controllers #
     ###############
 
-    client = CytonConnection()
+    client = CytonConnection(wait=False)
 
     controller = CytonController(client=client)
 

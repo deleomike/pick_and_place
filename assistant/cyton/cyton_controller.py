@@ -194,8 +194,6 @@ if __name__ == "__main__":
     client = CytonConnection()
     controller = CytonController(client=client)
 
-    time.sleep(5)
-
     controller.set_angles([1.058, 1.061, 0.2, 1.309, 0.0, 0.811476, 0.0, 0.013])
 
     # controller.set_angles([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01])
