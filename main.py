@@ -26,6 +26,7 @@ if 'myo' not in st.session_state:
 
 if 'leap' in st.session_state:
     leap = st.session_state['leap']
+    st.write("hello")
     st.metric("Fingers", leap.finger_mode)
 
 if 'myo' in st.session_state:

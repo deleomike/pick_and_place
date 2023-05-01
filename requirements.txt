@@ -8,4 +8,4 @@ pytest
 pynput
 tqdm
 openpyxl
-pillow
+ffmpeg-python

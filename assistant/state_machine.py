@@ -1,5 +1,8 @@
 import time
 
+import warnings
+warnings.filterwarnings("ignore")
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -92,23 +95,26 @@ class PickPlaceStateMachine:
             return
         # create pie chart object
         fig, ax = plt.subplots()
+        ax.clear()
+        ax.axis('equal')
+        ax.pie(metric_arr, labels=labels,autopct='%1.1f%%', shadow=True, startangle=140)
 
         # function to create objects on pie chart
-        def animate(i):
-            ax.clear()
-            ax.axis('equal')
-            ax.pie(metric_arr, labels=labels, shadow=True, startangle=140)
+        # def animate(i):
+        #     ax.clear()
+        #     ax.axis('equal')
+        #     ax.pie(metric_arr, labels=labels,autopct='%1.1f%%', shadow=True, startangle=140)
 
             # iterate pie chart as values change
 
-        anim = FuncAnimation(fig, animate, frames=100, repeat=False)
-
-        anim.save("metrics-anim.gif", writer="PillowWriter", dpi=200)
-
-        # show pie chart figure
-        plt.savefig("metrics.png")
-
-        plt.close(fig)
+        # anim = FuncAnimation(fig, animate, frames=1000, repeat=False)
+        #
+        # anim.save("metrics-anim.gif", dpi=200)
+        #
+        # # show pie chart figure
+        plt.savefig("metrics.png", dpi=200)
+        #
+        # plt.close(fig)
 
     def on_press(self, key):
         if key == keyboard.Key.space:
@@ -159,6 +165,7 @@ class PickPlaceStateMachine:
                         self.printed = False
                         self.state = 'pickup'
                     elif self.leap.finger_mode == 5 or self.leap.finger_mode == 0:
+                        self.printed = False
                         self.state = 'waiting'
 
                 elif self.state == 'pickup':
