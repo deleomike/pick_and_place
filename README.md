@@ -1,4 +1,6 @@
 [![Powered by the Robotics Toolbox](https://raw.githubusercontent.com/petercorke/robotics-toolbox-python/master/.github/svg/rtb_powered.min.svg)](https://github.com/petercorke/robotics-toolbox-python)
+[![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-310/)
+[![Python 2.7](https://img.shields.io/badge/python-2.7-blue.svg)](https://www.python.org/downloads/release/python-270/)
 
 # Pick and Place
 
@@ -14,7 +16,7 @@
 ## Requirements
 
 1. Matlab
-2. Python 3.9>
+2. Python 3.10
 3. Python 2.7
 4. Ultra Leap IR Sensor
 5. Myoband
