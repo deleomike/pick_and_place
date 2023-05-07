@@ -7,3 +7,5 @@ matplotlib
 pytest
 pynput
 tqdm
+openpyxl
+ffmpeg-python
