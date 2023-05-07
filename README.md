@@ -4,11 +4,36 @@
 
 2023 semester project for the Human Robotics Interaction course at JHU. A pick and place robot program.
 
+## Authors / Group Members
+
+1. Michael DeLeo - @deleomike
+2. Cyrus Hossainian - @chossai1
+3. Emma Kaufman - @emmakaufman14
+4. Saamahn Mahjouri -  @saams4u
+
+## Requirements
+
+1. Matlab
+2. Python 3.9>
+3. Python 2.7
+4. Ultra Leap IR Sensor
+5. Myoband
+6. Robai 7 DOF Robot
+
 ## Development
+
+### Setup
 
 HTTPS Clone
 ```
 git clone https://github.com/deleomike/pick_and_place.git
+```
+
+Create your python environment (Mac/Linux)
+```commandline
+python -m venv env
+. ./env/bin/activate
+pip install -r requirements.txt
 ```
 
 ## Demonstration
